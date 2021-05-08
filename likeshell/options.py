@@ -17,19 +17,29 @@ class SimpleOptionsHandler(BaseOptionsHandler):
     def validate_options(func: FunctionType, options: Queue, args: list):
         annotation = func.__annotations__
         al = []
-        for i in range(1000):
-            try:
-                arg = options.get(False)
-                arg_type = annotation[args[i]]
+        for a in args:
+            arg = options.get(False)
+            arg_type = annotation.get(a)
 
-                if arg_type == int:
-                    if not arg.isdigit():
-                        raise TypeError(f'{args[i]} is not a number')
-                    else:
-                        arg = int(arg)
-                al.append(arg)
-            except Empty:
+            if arg_type == int:
+                if arg.isdigit():
+                    arg = int(arg)
+                else:
+                    error = f'参数<{a}> 得到值"{arg}" 无法解析为int'
+                    raise TypeError(error)
+
+            if arg_type == float:
+                try:
+                    arg = float(arg)
+                except ValueError:
+                    error = f'参数<{a}> 得到值"{arg}" 无法解析为float'
+                    raise TypeError(error)
+
+            al.append(arg)
+
+            if options.empty():
                 break
+
         for i in al:
             options.put(i)
 
@@ -47,7 +57,7 @@ class SimpleOptionsHandler(BaseOptionsHandler):
         if not args:
             return
 
-        # self.validate_options(func, options, args)
+        self.validate_options(func, options, args)
 
         if 'args' in args:
             res = []
@@ -69,5 +79,5 @@ class SimpleOptionsHandler(BaseOptionsHandler):
                         if arg in func.__kwdefaults__:
                             break
                     else:
-                        raise NotImplementedError(f'Miss {arg}')
+                        raise NotImplementedError(f'缺少参数"{arg}"')
         return res
