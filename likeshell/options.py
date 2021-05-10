@@ -18,7 +18,11 @@ class SimpleOptionsHandler(BaseOptionsHandler):
         annotation = func.__annotations__
         al = []
         for a in args:
-            arg = options.get(False)
+            try:
+                arg = options.get(False)
+            except Empty:
+                break
+
             arg_type = annotation.get(a)
 
             if arg_type == int:
@@ -79,5 +83,6 @@ class SimpleOptionsHandler(BaseOptionsHandler):
                         if arg in func.__kwdefaults__:
                             break
                     else:
-                        raise NotImplementedError(f'Miss parameter "{arg}"')
+                        msg = f'Miss parameter "{arg}"'
+                        raise ValueError(msg)
         return res
