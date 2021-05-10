@@ -46,6 +46,8 @@ class CommandHandler:
 
         args = self.tasks.options_handler.process_options(func, self.options)
 
+        self.tasks.__before__()
+
         # run task
         if isinstance(args, dict):
             func(**args)
@@ -53,6 +55,8 @@ class CommandHandler:
             func(*args)
         else:
             func()
+
+        self.tasks.__after__()
 
     def help(self, option: Optional[str] = None):
         if option:
