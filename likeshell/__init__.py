@@ -3,8 +3,8 @@ from .options import SimpleOptionsHandler
 
 
 class Shell(metaclass=GsMeta):
-    options_handler = SimpleOptionsHandler()
-    default_bash = None
+    __options_handler__ = SimpleOptionsHandler()
+    __default_bash__ = None
 
     def __before__(self):
         pass
