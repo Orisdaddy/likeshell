@@ -1,5 +1,7 @@
 # likeshell
 
+[![PyPI version](https://badge.fury.io/py/likeshell.svg)](https://badge.fury.io/py/likeshell)
+
 likeshell 快速构建自己的命令行工具，扩展性强、可配置、开箱即用。
 
 ## 要求
