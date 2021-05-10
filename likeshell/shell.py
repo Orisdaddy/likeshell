@@ -2,8 +2,12 @@ import sys
 import os
 from queue import Queue
 from .console import output
+from .comment import parse_comment
 
 from typing import Optional
+
+
+__BUILT_IN__ = ('__options_handler__', '__default_bash__')
 
 
 class CommandHandler:
@@ -23,9 +27,9 @@ class CommandHandler:
             self.help()
 
     def default_command(self):
-        if self.tasks.default_bash:
+        if self.tasks.__default_bash__:
             cmd = ' '.join(self.args[1:])
-            os.system(f'{self.tasks.default_bash} {cmd}')
+            os.system(f'{self.tasks.__default_bash__} {cmd}')
 
     def run_script(self):
         action = self.action
@@ -36,6 +40,10 @@ class CommandHandler:
                 option = None
             self.help(option)
 
+        if hasattr(self.tasks, '__alias__'):
+            if self.tasks.__alias__.get(action):
+                action = self.tasks.__alias__[action]
+
         func = getattr(self.tasks, action, None)
 
         if func is None:
@@ -44,7 +52,7 @@ class CommandHandler:
         if not callable(func):
             return
 
-        args = self.tasks.options_handler.process_options(func, self.options)
+        args = self.tasks.__options_handler__.process_options(func, self.options)
 
         self.tasks.__before__()
 
@@ -89,7 +97,21 @@ class GsMeta(type):
     def __init__(cls, what, ex, dic):
         if what != 'Shell':
             args = sys.argv[1:]
-            tasks = {k: v for k, v in dic.items() if not (k.startswith('__') or k.endswith('__'))}
+            tasks = {
+                k: v for k, v in dic.items()
+                if not (k.startswith('__') or k.endswith('__') and k not in __BUILT_IN__)
+            }
+
+            for k, v in tasks.items():
+                if v.__doc__:
+                    doc_meta = parse_comment(v.__doc__)
+                    alias = doc_meta.get('alias')
+                    if alias:
+                        if hasattr(cls, '__alias__'):
+                            cls.__alias__[alias] = v.__name__
+                        else:
+                            cls.__alias__ = {alias: v.__name__}
+
             cls.__task__ = tasks
             ch = CommandHandler(args, cls)
             ch.run_script()
