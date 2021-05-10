@@ -10,7 +10,7 @@ CYAN = 36
 WHITE = 37
 
 
-def output(content, weight=0, color=30, *args, **kwargs):
+def output(content, weight=0, color=37, *args, **kwargs):
     print(__OUTPUT_STR.format(
         weight=weight,
         color=color,
