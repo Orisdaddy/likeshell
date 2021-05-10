@@ -1,16 +1,23 @@
 # -*- coding: utf-8 -*-
 import importlib
+import os
 from setuptools import setup
 
-DESCRIPTION = ""
+DESCRIPTION = "快速构建自己的命令行工具包。 Quickly develop your command line interface(CLI) toolkit."
 VERSION = importlib.import_module('likeshell.__version__').__version__
+
+LONG_DESCRIPTION = ""
+if os.path.exists('./README.md'):
+    with open('./README.md', encoding='utf-8') as f:
+        LONG_DESCRIPTION = f.read()
+
 
 setup(
     name='likeshell',
     version=VERSION,
     description=DESCRIPTION,
-    # long_description='',
-    # long_description_content_type='text/markdown',
+    long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     author="Fizone",
     author_email="edeport126@gmail.com",
     license='Apache License 2.0',
