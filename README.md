@@ -43,7 +43,8 @@ class MyTasks(likeshell.Shell):
 
 ```shell script
 >> python demo.py task1 str1 100 10.01
-<< s1 is str1
+<< run test1
+   s1 is str1
    i1 is 100
    f1 is 10.01
 
