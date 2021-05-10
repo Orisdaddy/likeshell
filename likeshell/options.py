@@ -25,14 +25,14 @@ class SimpleOptionsHandler(BaseOptionsHandler):
                 if arg.isdigit():
                     arg = int(arg)
                 else:
-                    error = f'参数<{a}> 得到值"{arg}" 无法解析为int'
+                    error = f'"{arg}" is not a int'
                     raise TypeError(error)
 
             if arg_type == float:
                 try:
                     arg = float(arg)
                 except ValueError:
-                    error = f'参数<{a}> 得到值"{arg}" 无法解析为float'
+                    error = f'"{arg}" is not a float'
                     raise TypeError(error)
 
             al.append(arg)
@@ -79,5 +79,5 @@ class SimpleOptionsHandler(BaseOptionsHandler):
                         if arg in func.__kwdefaults__:
                             break
                     else:
-                        raise NotImplementedError(f'缺少参数"{arg}"')
+                        raise NotImplementedError(f'Miss parameter "{arg}"')
         return res
