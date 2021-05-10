@@ -4,8 +4,6 @@ import time
 import likeshell
 import subprocess
 
-sys.argv = ['test.py', 'delete_branch', 'dev']
-
 pop = subprocess.Popen
 
 upstream = 'upstream'
