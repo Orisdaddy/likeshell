@@ -83,6 +83,6 @@ class SimpleOptionsHandler(BaseOptionsHandler):
                         if arg in func.__kwdefaults__:
                             break
                     else:
-                        msg = f'Miss parameter "{arg}"'
+                        msg = f'Missing parameter "{arg}"'
                         raise ValueError(msg)
         return res
