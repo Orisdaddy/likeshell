@@ -1,5 +1,6 @@
 # likeshell
 
+likeshell 快速构建自己的命令行工具，扩展性强、可配置、开箱即用。
 
 ## 要求
 
@@ -10,7 +11,7 @@ Python >= 3.6
 使用pip安装
 
 ```shell script
-$ pip install like shell
+$ pip install likeshell
 ```
 
 
