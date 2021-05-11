@@ -1,6 +1,9 @@
 class Context:
-    def __init__(self):
-        self.context = {}
+    def __init__(self, context=None):
+        if context is None:
+            self.context = {}
+        else:
+            self.context = context
 
     @property
     def empty(self):
@@ -38,8 +41,16 @@ class Argument(Context):
     def get(self, name):
         return self.context.get(name)
 
-    @property
-    def empty(self):
-        return self.context
+
+class Ignore(Context):
+    def __init__(self):
+        super().__init__([])
+
+    def add(self, name):
+        self.context.append(name)
+
+    def exist(self, name):
+        return name in self.context
 
 
+ignore_set = Ignore()

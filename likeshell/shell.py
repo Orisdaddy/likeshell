@@ -3,7 +3,7 @@ import os
 from queue import Queue
 from .console import *
 from .comment import parse_comment
-from .context import alias_set
+from .context import alias_set, ignore_set
 
 from typing import Optional
 
@@ -34,6 +34,10 @@ class CommandHandler:
 
     def run_script(self):
         action = self.action
+
+        if ignore_set.exist(action) or action.startswith('_'):
+            return
+
         if action == '-h':
             if len(self.args) > 1:
                 option = self.args[1]
@@ -102,7 +106,7 @@ def run_cls(cls, dic):
     args = sys.argv[1:]
     tasks = {
         k: v for k, v in dic.items()
-        if not (k.startswith('_') or k.endswith('__') and k not in __BUILT_IN__)
+        if not (k.startswith('_') or k.endswith('__')) and k not in __BUILT_IN__ and not ignore_set.exist(k)
     }
 
     for k, v in tasks.items():

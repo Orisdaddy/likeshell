@@ -1,6 +1,6 @@
 from .shell import GsMeta
 from .options import SimpleOptionsHandler
-from .decoration import alias
+from .decoration import alias, ignore
 
 
 class Main:
