@@ -2,7 +2,8 @@
 
 [![PyPI version](https://badge.fury.io/py/likeshell.svg)](https://badge.fury.io/py/likeshell)
 
-likeshell 快速构建自己的命令行工具，扩展性强、可配置、开箱即用、干净整洁。
+likeshell 快速构建自己的命令行工具，扩展性强、可配置、开箱即用、干净整洁，
+只需一步构建自己的CLI。
 
 ## 要求
 
@@ -57,5 +58,19 @@ class MyTasks(likeshell.Shell):
 >> python demo.py task2
 << run test2
 
-
 ```
+
+
+## 功能文档
+### 基础功能
+
+- [基本使用](docs/basic/Usage.md)
+- [参数](docs/basic/Parameter.md)
+- [钩子](docs/basic/Hook.md)
+- [配置](docs/basic/Config.md)
+- [帮助](docs/basic/Help.md)
+
+### 高级功能
+
+- [任务别名](docs/advanced/Alias.md)
+- [无视任务](docs/advanced/Ignore.md)
