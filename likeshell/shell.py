@@ -49,6 +49,9 @@ class CommandHandler:
             if alias_set.get(action):
                 action = alias_set.get(action)
 
+                if ignore_set.exist(action):
+                    return
+
         func = getattr(self.tasks, action, None)
 
         if func is None:
