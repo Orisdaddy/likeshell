@@ -11,6 +11,14 @@ from typing import Optional
 __BUILT_IN__ = ('__options_handler__', '__default_bash__')
 
 
+def command_not_found(action, throws=True):
+    msg = f'{action} is not found.'
+    if throws:
+        raise RuntimeError(msg)
+    else:
+        output(msg)
+
+
 class CommandHandler:
     def __init__(self, args, cls):
 
@@ -31,12 +39,14 @@ class CommandHandler:
         if self.tasks.__default_bash__:
             cmd = ' '.join(self.args[1:])
             os.system(f'{self.tasks.__default_bash__} {cmd}')
+        else:
+            command_not_found(self.action)
 
     def run_script(self):
         action = self.action
 
         if ignore_set.exist(action) or action.startswith('_'):
-            return
+            return command_not_found(self.action)
 
         if action == '-h':
             if len(self.args) > 1:
@@ -58,7 +68,7 @@ class CommandHandler:
             self.default_command()
 
         if not callable(func):
-            return
+            return command_not_found(self.action)
 
         args = self.tasks.__options_handler__.process_options(func, self.options)
 
@@ -87,7 +97,7 @@ class CommandHandler:
                 else:
                     output('The command description is empty.')
             else:
-                output('The command is not fount.')
+                command_not_found(self.action, False)
         else:
             output('帮助:')
             output('  <shell> -h')
