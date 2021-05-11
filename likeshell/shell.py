@@ -1,8 +1,9 @@
 import sys
 import os
 from queue import Queue
-from .console import output
+from .console import *
 from .comment import parse_comment
+from .alias import alias_set
 
 from typing import Optional
 
@@ -40,9 +41,9 @@ class CommandHandler:
                 option = None
             self.help(option)
 
-        if hasattr(self.tasks, '__alias__'):
-            if self.tasks.__alias__.get(action):
-                action = self.tasks.__alias__[action]
+        if alias_set.namespace:
+            if alias_set.get_alias(action):
+                action = alias_set.get_alias(action)
 
         func = getattr(self.tasks, action, None)
 
@@ -68,10 +69,14 @@ class CommandHandler:
 
     def help(self, option: Optional[str] = None):
         if option:
+            if alias_set.namespace:
+                if alias_set.get_alias(option):
+                    option = alias_set.get_alias(option)
+
             task = getattr(self.tasks, option, None)
             if task:
                 if task.__doc__:
-                    output(task.__doc__)
+                    output_comment(task.__doc__, color=GREEN)
                 else:
                     output('The command description is empty.')
             else:
@@ -106,11 +111,7 @@ class GsMeta(type):
                 if v.__doc__:
                     doc_meta = parse_comment(v.__doc__)
                     alias = doc_meta.get('alias')
-                    if alias:
-                        if hasattr(cls, '__alias__'):
-                            cls.__alias__[alias] = v.__name__
-                        else:
-                            cls.__alias__ = {alias: v.__name__}
+                    alias_set.add_alias(alias, v.__name__)
 
             cls.__task__ = tasks
             ch = CommandHandler(args, cls)

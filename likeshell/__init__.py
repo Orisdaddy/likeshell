@@ -1,5 +1,6 @@
 from .shell import GsMeta
 from .options import SimpleOptionsHandler
+from .decoration import alias
 
 
 class Shell(metaclass=GsMeta):
