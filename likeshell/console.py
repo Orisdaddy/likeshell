@@ -40,8 +40,20 @@ def output(content, background=0, color=WHITE, *args, **kwargs):
 
 def output_comment(content, background=0, color=WHITE, *args, **kwargs):
     msg = ''
-    for i in content.split(os.linesep):
-        msg += f'{i.strip()}{os.linesep}'
+    content = content.strip(os.linesep)
+
+    indent_space = 0
+    for i, v in enumerate(content.split(os.linesep)):
+        if i == 0:
+            for index, char in enumerate(v):
+                if char != ' ':
+                    indent_space = index
+                    break
+        # Eliminate spaces
+        line = v[indent_space:]
+        msg += f'{line}{os.linesep}'
+
+    # output
     print(__OUTPUT_STR.format(
         background=background,
         color=color,
