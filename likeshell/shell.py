@@ -126,7 +126,8 @@ def run_cls(cls, dic):
         if v.__doc__:
             doc_meta = parse_comment(v.__doc__)
             alias = doc_meta.get('alias')
-            alias_set.add(alias, v.__name__)
+            if alias:
+                alias_set.add(alias, v.__name__)
 
     cls.__task__ = tasks
     ch = CommandHandler(args, cls)
