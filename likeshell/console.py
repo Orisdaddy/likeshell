@@ -1,5 +1,13 @@
 import os
 
+__all__ = [
+    'BOLD', 'BLACK', 'RED', 'GREEN', 'YELLOW',
+    'BLUE', 'MAGENTA', 'CYAN', 'WHITE',
+    'BG_BOLD', 'BG_BLACK', 'BG_RED', 'BG_GREEN',
+    'BG_YELLOW', 'BG_BLUE', 'BG_MAGENTA', 'BG_CYAN',
+    'BG_WHITE', 'output', 'output_comment',
+]
+
 __OUTPUT_STR = '\033[{background};{color}m{content}\033[0m'
 BOLD = 1
 BLACK = 30

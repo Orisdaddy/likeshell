@@ -4,7 +4,7 @@ class Context:
 
     @property
     def empty(self):
-        return self.context
+        return not self.context
 
 
 class Alias(Context):

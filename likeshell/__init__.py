@@ -3,7 +3,7 @@ from .options import SimpleOptionsHandler
 from .decoration import alias
 
 
-class Shell(metaclass=GsMeta):
+class Main:
     __options_handler__ = SimpleOptionsHandler()
     __default_bash__ = None
 
@@ -12,3 +12,7 @@ class Shell(metaclass=GsMeta):
 
     def __after__(self):
         pass
+
+
+class Shell(Main, metaclass=GsMeta):
+    pass

@@ -41,7 +41,7 @@ class CommandHandler:
                 option = None
             self.help(option)
 
-        if alias_set.namespace:
+        if not alias_set.empty:
             if alias_set.get(action):
                 action = alias_set.get(action)
 
@@ -69,7 +69,7 @@ class CommandHandler:
 
     def help(self, option: Optional[str] = None):
         if option:
-            if alias_set.namespace:
+            if not alias_set.empty:
                 if alias_set.get(option):
                     option = alias_set.get(option)
 
@@ -98,22 +98,26 @@ class CommandHandler:
         sys.exit()
 
 
+def run_cls(cls, dic):
+    args = sys.argv[1:]
+    tasks = {
+        k: v for k, v in dic.items()
+        if not (k.startswith('_') or k.endswith('__') and k not in __BUILT_IN__)
+    }
+
+    for k, v in tasks.items():
+        if v.__doc__:
+            doc_meta = parse_comment(v.__doc__)
+            alias = doc_meta.get('alias')
+            alias_set.add(alias, v.__name__)
+
+    cls.__task__ = tasks
+    ch = CommandHandler(args, cls)
+    ch.run_script()
+
+
 class GsMeta(type):
     def __init__(cls, what, ex, dic):
         if what != 'Shell':
-            args = sys.argv[1:]
-            tasks = {
-                k: v for k, v in dic.items()
-                if not (k.startswith('_') or k.endswith('__') and k not in __BUILT_IN__)
-            }
-
-            for k, v in tasks.items():
-                if v.__doc__:
-                    doc_meta = parse_comment(v.__doc__)
-                    alias = doc_meta.get('alias')
-                    alias_set.add(alias, v.__name__)
-
-            cls.__task__ = tasks
-            ch = CommandHandler(args, cls)
-            ch.run_script()
+            run_cls(cls, dic)
         super().__init__(what, ex, dic)
