@@ -3,7 +3,7 @@ import os
 from queue import Queue
 from .console import *
 from .comment import parse_comment
-from .alias import alias_set
+from .context import alias_set
 
 from typing import Optional
 
@@ -42,8 +42,8 @@ class CommandHandler:
             self.help(option)
 
         if alias_set.namespace:
-            if alias_set.get_alias(action):
-                action = alias_set.get_alias(action)
+            if alias_set.get(action):
+                action = alias_set.get(action)
 
         func = getattr(self.tasks, action, None)
 
@@ -70,8 +70,8 @@ class CommandHandler:
     def help(self, option: Optional[str] = None):
         if option:
             if alias_set.namespace:
-                if alias_set.get_alias(option):
-                    option = alias_set.get_alias(option)
+                if alias_set.get(option):
+                    option = alias_set.get(option)
 
             task = getattr(self.tasks, option, None)
             if task:
@@ -104,14 +104,14 @@ class GsMeta(type):
             args = sys.argv[1:]
             tasks = {
                 k: v for k, v in dic.items()
-                if not (k.startswith('__') or k.endswith('__') and k not in __BUILT_IN__)
+                if not (k.startswith('_') or k.endswith('__') and k not in __BUILT_IN__)
             }
 
             for k, v in tasks.items():
                 if v.__doc__:
                     doc_meta = parse_comment(v.__doc__)
                     alias = doc_meta.get('alias')
-                    alias_set.add_alias(alias, v.__name__)
+                    alias_set.add(alias, v.__name__)
 
             cls.__task__ = tasks
             ch = CommandHandler(args, cls)
