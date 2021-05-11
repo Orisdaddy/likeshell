@@ -41,7 +41,7 @@ def output(content, background=0, color=WHITE, *args, **kwargs):
 def output_comment(content, background=0, color=WHITE, *args, **kwargs):
     msg = ''
     for i in content.split(os.linesep):
-        msg += f'  {i.strip()}{os.linesep}'
+        msg += f'{i.strip()}{os.linesep}'
     print(__OUTPUT_STR.format(
         background=background,
         color=color,
