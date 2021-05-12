@@ -10,7 +10,15 @@ SKIP_GETVALUE = ('Input', )
 
 
 class BaseOptionsHandler:
-    def process_options(self, func: FunctionType, options: Queue):
+    options_type = None
+
+    def process_options(self, func: FunctionType, options):
+        """
+        Process parameters and return a list or dict
+
+        :param func: The command method
+        :param options: Parameter container specified by `options_type`
+        """
         raise NotImplementedError
 
 

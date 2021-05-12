@@ -41,6 +41,10 @@ class CommandHandler:
             self.help()
 
     def default_command(self):
+        """
+        If the command is not found in program,
+        the command will be executed by the program specified by `__default_bash__`
+        """
         if self.tasks.__default_bash__:
             cmd = ' '.join(self.args[1:])
             os.system(f'{self.tasks.__default_bash__} {cmd}')
