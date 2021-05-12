@@ -74,3 +74,4 @@ class MyTasks(likeshell.Shell):
 
 - [任务别名](docs/advanced/Alias.md)
 - [无视任务](docs/advanced/Ignore.md)
+- [程序入口](docs/advanced/Main.md)
