@@ -82,8 +82,6 @@ class SimpleOptionsHandler(BaseOptionsHandler):
         if not args:
             return
 
-        self.validate_options(func, options, args)
-
         if 'args' in args:
             res = []
             while True:
@@ -92,6 +90,8 @@ class SimpleOptionsHandler(BaseOptionsHandler):
                 except Empty:
                     break
         else:
+            self.validate_options(func, options, args)
+
             res = {}
             for arg in args:
                 try:
