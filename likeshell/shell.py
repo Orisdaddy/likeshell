@@ -113,10 +113,10 @@ class CommandHandler:
             output('用法:')
             output('  <shell> <action> [options...]', end='\n\n')
 
-            cm = sorted(self.tasks.__task__)
+            cm = sorted(self.tasks.__likeshell_task__)
             output('命令:')
             for k in cm:
-                # func_name = self.tasks.__task__[k]
+                # func_name = self.tasks.__likeshell_task__[k]
                 space = ' '
                 opt = f'  {k}'
                 output(opt)
@@ -137,7 +137,7 @@ def run_cls(cls, dic):
             if alias:
                 alias_set.add(alias, v.__name__)
 
-    cls.__task__ = tasks
+    cls.__likeshell_task__ = tasks
     ch = CommandHandler(args, cls)
     ch.run_script()
 
