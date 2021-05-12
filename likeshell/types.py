@@ -23,7 +23,7 @@ class Input:
             callback: FunctionType = None,
             hide: bool = False
     ):
-        message = adapt_colon(message) or adapt_colon(self.default)
+        message = message or adapt_colon(self.default)
 
         if hide is True:
             result = getpass.getpass(message)
