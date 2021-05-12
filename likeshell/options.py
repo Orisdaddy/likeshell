@@ -3,6 +3,11 @@ from queue import Queue, Empty
 from types import FunctionType
 from typing import Union
 
+from .types import Input
+
+
+SKIP_GETVALUE = ('Input', )
+
 
 class BaseOptionsHandler:
     def process_options(self, func: FunctionType, options: Queue):
@@ -18,12 +23,20 @@ class SimpleOptionsHandler(BaseOptionsHandler):
         annotation = func.__annotations__
         al = []
         for a in args:
+            arg_type = annotation.get(a)
+
+            if hasattr(arg_type, '__name__') and arg_type.__name__ in SKIP_GETVALUE:
+                arg = None
+                if arg_type.__name__ == 'Input':
+                    arg = Input(args)
+
+                al.append(arg)
+                continue
+
             try:
                 arg = options.get(False)
             except Empty:
                 break
-
-            arg_type = annotation.get(a)
 
             if arg_type == int:
                 if arg.isdigit():

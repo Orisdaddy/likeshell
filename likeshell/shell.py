@@ -24,12 +24,17 @@ class CommandHandler:
 
         self.args = args
 
-        options = Queue()
-        for a in args[1:]:
-            options.put(a)
+        self.tasks = cls()
+
+        if self.tasks.__options_handler__.options_type == 'Queue':
+            options = Queue()
+            for a in args[1:]:
+                options.put(a)
+        else:
+            options = args[1:]
+
         self.options = options
 
-        self.tasks = cls()
         if self.args:
             self.action = self.args[0]
         else:
@@ -70,7 +75,10 @@ class CommandHandler:
         if not callable(func):
             return command_not_found(self.action)
 
-        args = self.tasks.__options_handler__.process_options(func, self.options)
+        if isinstance(self.tasks.__options_handler__, type):
+            args = self.tasks.__options_handler__().process_options(func, self.options)
+        else:
+            args = self.tasks.__options_handler__.process_options(func, self.options)
 
         self.tasks.__before__()
 

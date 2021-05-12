@@ -2,7 +2,7 @@ from .context import alias_set, ignore_set
 from functools import wraps
 
 
-def alias(name):
+def alias(name: str):
     def i(func):
         @wraps(func)
         def set_alias(*args, **kwargs):
