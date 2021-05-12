@@ -15,7 +15,7 @@ class BaseOptionsHandler:
 
 
 class SimpleOptionsHandler(BaseOptionsHandler):
-    """ 顺序解析器 """
+    """ A simple parameters handler """
     options_type = 'Queue'
 
     @staticmethod

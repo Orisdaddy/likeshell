@@ -14,6 +14,10 @@ def parse_alias(content):
 
 
 def parse_comment(doc):
+    """
+    Parse comment to get information about method or parameter
+    E.g. `:keyword`
+    """
     meta = {
         'alias': None
     }
