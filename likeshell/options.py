@@ -175,7 +175,7 @@ class OptionsTagHandler(BaseOptionsHandler):
             if self.find_tag(p, context):
                 break
             pos_args.append(p)
-        print(varnames, pos_args)
+
         args = {}
         for index, var in enumerate(varnames):
             try:
