@@ -38,7 +38,7 @@ class SimpleOptionsHandler(BaseOptionsHandler):
             if hasattr(arg_type, '__name__') and arg_type.__name__ in SKIP_GETVALUE:
                 arg = None
                 if arg_type.__name__ == 'Input':
-                    arg = Input(args)
+                    arg = Input(a)
 
                 al.append(arg)
                 continue
@@ -165,6 +165,57 @@ class OptionsTagHandler(BaseOptionsHandler):
                     tag_context[k]['required'] = False
         return tag_context
 
+    @staticmethod
+    def validate_type(annotation: dict, args: dict):
+        result = {}
+        for k, v in args.items():
+            arg_type = annotation.get(k)
+            arg = v
+
+            if hasattr(arg_type, '__name__') and arg_type.__name__ in SKIP_GETVALUE:
+                arg = None
+                if arg_type.__name__ == 'Input':
+                    arg = Input(k)
+
+                result[k] = arg
+                continue
+
+            if arg_type == int:
+                if isinstance(v, str):
+                    if v.isdigit():
+                        arg = int(v)
+                    else:
+                        error = f'"{v}" is not a int'
+                        raise TypeError(error)
+                elif isinstance(v, list):
+                    arg = []
+                    for i in v:
+                        if i.isdigit():
+                            i = int(i)
+                        else:
+                            error = f'"{i}" is not a int'
+                            raise TypeError(error)
+                        arg.append(i)
+
+            if arg_type == float:
+                if isinstance(v, str):
+                    try:
+                        arg = float(v)
+                    except ValueError:
+                        error = f'"{v}" is not a float'
+                        raise TypeError(error)
+                elif isinstance(v, list):
+                    arg = []
+                    for i in v:
+                        try:
+                            i = float(i)
+                        except ValueError:
+                            error = f'"{i}" is not a float'
+                            raise TypeError(error)
+                        arg.append(i)
+            result[k] = arg
+        return result
+
     def get_positional_parameters(self, context, opts, func):
         varnames = list(func.__code__.co_varnames[1:])
         for key in context.keys():
@@ -177,6 +228,12 @@ class OptionsTagHandler(BaseOptionsHandler):
             pos_args.append(p)
 
         args = {}
+        for i in varnames[:]:
+            var_type = func.__annotations__.get(i)
+            if var_type and hasattr(var_type, '__name__') and var_type.__name__ == 'Input':
+                args[i] = None
+                varnames.remove(i)
+
         for index, var in enumerate(varnames):
             try:
                 args[var] = pos_args[index]
@@ -267,5 +324,7 @@ class OptionsTagHandler(BaseOptionsHandler):
                     raise RuntimeError(msg)
             else:
                 has_tag = True
+
+        args = self.validate_type(func.__annotations__, args)
 
         return args
