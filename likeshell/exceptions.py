@@ -6,9 +6,14 @@ class LikeShellError(Exception):
     pass
 
 
+class UsageError(LikeShellError):
+    pass
+
+
+class DefinitionError(LikeShellError):
+    pass
+
+
 class ParameterError(LikeShellError):
     pass
 
-
-class UsageError(LikeShellError):
-    pass

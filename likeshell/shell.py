@@ -1,9 +1,12 @@
 import sys
 import os
 from queue import Queue
+
 from .console import *
 from .comment import parse_comment
 from .context import alias_set, ignore_set
+from .options import OptionsTagHandler, SimpleOptionsHandler
+from .types import Options
 
 from typing import Optional
 
@@ -12,7 +15,7 @@ __BUILT_IN__ = ('__options_handler__', '__default_bash__')
 
 
 def command_not_found(action, throws=True):
-    msg = f'{action} is not found.'
+    msg = f'Commend "{action}" is not found.'
     if throws:
         raise RuntimeError(msg)
     else:
@@ -21,24 +24,33 @@ def command_not_found(action, throws=True):
 
 class CommandHandler:
     def __init__(self, args, cls):
-
         self.args = args
+        self.options = None
 
         self.tasks = cls()
 
-        if self.tasks.__options_handler__.options_type == 'Queue':
-            options = Queue()
-            for a in args[1:]:
-                options.put(a)
-        else:
-            options = args[1:]
-
-        self.options = options
-
+        # if args is empty.
         if self.args:
             self.action = self.args[0]
         else:
             self.help()
+
+    def load_parameters(self, func):
+        for t in func.__annotations__.values():
+            if issubclass(t, Options):
+                self.tasks.__options_handler__ = OptionsTagHandler()
+                break
+
+        if hasattr(func, '__ls_tag__'):
+            self.tasks.__options_handler__ = OptionsTagHandler()
+
+        if self.tasks.__options_handler__.options_type == 'Queue':
+            options = Queue()
+            for a in self.args[1:]:
+                options.put(a)
+        else:
+            options = self.args[1:]
+        self.options = options
 
     def default_command(self):
         """
@@ -57,7 +69,7 @@ class CommandHandler:
         if ignore_set.exist(action) or action.startswith('_'):
             return command_not_found(self.action)
 
-        if action == '-h':
+        if action in ('-h', '--help'):
             if len(self.args) > 1:
                 option = self.args[1]
             else:
@@ -78,6 +90,8 @@ class CommandHandler:
 
         if not callable(func):
             return command_not_found(self.action)
+
+        self.load_parameters(func)
 
         if isinstance(self.tasks.__options_handler__, type):
             args = self.tasks.__options_handler__().process_options(func, self.options)
@@ -117,10 +131,10 @@ class CommandHandler:
             output('用法:')
             output('  <shell> <action> [options...]', end='\n\n')
 
-            cm = sorted(self.tasks.__likeshell_task__)
+            cm = sorted(self.tasks.__ls_task__)
             output('命令:')
             for k in cm:
-                # func_name = self.tasks.__likeshell_task__[k]
+                # func_name = self.tasks.__ls_task__[k]
                 space = ' '
                 opt = f'  {k}'
                 output(opt)
@@ -141,7 +155,7 @@ def run_cls(cls, dic):
             if alias:
                 alias_set.add(alias, v.__name__)
 
-    cls.__likeshell_task__ = tasks
+    cls.__ls_task__ = tasks
     ch = CommandHandler(args, cls)
     ch.run_script()
 
@@ -151,3 +165,18 @@ class GsMeta(type):
         if what != 'Shell':
             run_cls(cls, dic)
         super().__init__(what, ex, dic)
+
+
+class Main:
+    __options_handler__ = SimpleOptionsHandler()
+    __default_bash__: str = None
+
+    def __before__(self):
+        pass
+
+    def __after__(self):
+        pass
+
+
+class Shell(Main, metaclass=GsMeta):
+    pass
