@@ -1,5 +1,6 @@
 import sys
 import os
+import difflib
 from queue import Queue
 
 from .console import *
@@ -12,14 +13,6 @@ from typing import Optional
 
 
 __BUILT_IN__ = ('__options_handler__', '__default_bash__')
-
-
-def command_not_found(action, throws=True):
-    msg = f'Commend "{action}" is not found.'
-    if throws:
-        raise RuntimeError(msg)
-    else:
-        output(msg)
 
 
 class CommandHandler:
@@ -52,6 +45,31 @@ class CommandHandler:
             options = self.args[1:]
         self.options = options
 
+    def command_not_found(self, action, throws=True):
+        instruction = {}
+        instruction.update(alias_set.context)
+        instruction.update(self.tasks.__ls_task__)
+
+        similarity_dice = {}
+        for i in instruction:
+            qr = difflib.SequenceMatcher(a=action, b=i).quick_ratio()
+            if qr:
+                similarity_dice[i] = qr
+
+        similarity = None
+        if similarity_dice:
+            similarity = max(similarity_dice, key=lambda k: similarity_dice[k])
+
+        similar = ''
+        if similarity:
+            similar = f' Similar command: {similarity}'
+
+        msg = f'Commend "{action}" is not found.{similar}'
+        if throws:
+            raise RuntimeError(msg)
+        else:
+            output(msg)
+
     def default_command(self):
         """
         If the command is not found in program,
@@ -61,13 +79,13 @@ class CommandHandler:
             cmd = ' '.join(self.args[1:])
             os.system(f'{self.tasks.__default_bash__} {cmd}')
         else:
-            command_not_found(self.action)
+            self.command_not_found(self.action)
 
     def run_script(self):
         action = self.action
 
         if ignore_set.exist(action) or action.startswith('_'):
-            return command_not_found(self.action)
+            return self.command_not_found(self.action)
 
         if action in ('-h', '--help'):
             if len(self.args) > 1:
@@ -89,7 +107,7 @@ class CommandHandler:
             self.default_command()
 
         if not callable(func):
-            return command_not_found(self.action)
+            return self.command_not_found(self.action)
 
         self.load_parameters(func)
 
@@ -123,7 +141,7 @@ class CommandHandler:
                 else:
                     output('The command description is empty.')
             else:
-                command_not_found(self.action, False)
+                self.command_not_found(self.action, False)
         else:
             output('帮助:')
             output('  <shell> -h')
