@@ -8,6 +8,7 @@ from .comment import parse_comment
 from .context import alias_set, ignore_set, opt_set
 from .options import OptionsTagHandler, SimpleOptionsHandler
 from .types import Options
+from .exceptions import CommandError, COMMAND_NOT_FOUND
 
 from typing import Optional
 
@@ -67,7 +68,7 @@ class CommandHandler:
 
         msg = f'Commend "{action}" is not found.{similar}'
         if throws:
-            raise RuntimeError(msg)
+            raise CommandError(COMMAND_NOT_FOUND, cmd=action, msg=msg)
         else:
             output(msg)
 

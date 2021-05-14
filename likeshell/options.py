@@ -7,6 +7,7 @@ from typing import Union, List
 
 from .types import Input, Options
 from .context import opt_set
+from .exceptions import ParameterError, DefinitionError, PARAMETER_TYPE, MISS_PARAMETER
 
 
 SKIP_GETVALUE = ('Input', )
@@ -15,7 +16,7 @@ SKIP_GETVALUE = ('Input', )
 def assert_int(a):
     if not a.isdigit():
         error = f'"{a}" is not a int'
-        raise TypeError(error)
+        raise ParameterError(PARAMETER_TYPE, arg=a, msg=error)
     return int(a)
 
 
@@ -24,7 +25,7 @@ def assert_float(a):
         arg = float(a)
     except ValueError:
         error = f'"{a}" is not a float'
-        raise TypeError(error)
+        raise ParameterError(PARAMETER_TYPE, arg=a, msg=error)
     return arg
 
 
@@ -76,10 +77,8 @@ class SimpleOptionsHandler(BaseOptionsHandler):
 
             if options.empty():
                 break
-            else:
-                options.full()
-                break
 
+        options.full()
         for i in al:
             options.put(i)
 
@@ -119,8 +118,7 @@ class SimpleOptionsHandler(BaseOptionsHandler):
                         if arg in func.__kwdefaults__:
                             break
                     else:
-                        msg = f'Missing parameter "{arg}"'
-                        raise ValueError(msg)
+                        raise ParameterError(MISS_PARAMETER, arg=arg)
         return res
 
 
@@ -161,14 +159,14 @@ class OptionsTagHandler(BaseOptionsHandler):
                 if isinstance(v['tag'], str):
                     if v['tag'] in tag_list:
                         msg = f'Duplicate tag: {v["tag"]}'
-                        raise RuntimeError(msg)
+                        raise DefinitionError(msg)
 
                     tag_list.append(v['tag'])
                 elif isinstance(v['tag'], (tuple, list)):
                     for i in v['tag']:
                         if i in tag_list:
                             msg = f'Duplicate tag: {i}'
-                            raise RuntimeError(msg)
+                            raise DefinitionError(msg)
 
                         tag_list.append(v['tag'])
 
@@ -242,7 +240,7 @@ class OptionsTagHandler(BaseOptionsHandler):
             try:
                 args[var] = pos_args[index]
             except IndexError:
-                raise RuntimeError(f'Miss parameter {var}')
+                raise ParameterError(MISS_PARAMETER, arg=var)
         return args
 
     def get_tag_parameters(self, context, opts):
@@ -296,13 +294,13 @@ class OptionsTagHandler(BaseOptionsHandler):
                         s = 's'
 
                     msg = f'"{k}" takes {v["arglen"]} parameter{s} but {len(tag_args_list)} were given'
-                    raise RuntimeError(msg)
+                    raise DefinitionError(msg)
                 elif len(tag_args_list) < v['arglen']:
                     if v["arglen"] - len(tag_args_list):
                         s = 's'
 
                     msg = f'"{k}"[{v["common_tag"]}] missing {v["arglen"] - len(tag_args_list)} required parameter{s}'
-                    raise RuntimeError(msg)
+                    raise DefinitionError(msg)
                 else:
                     if len(tag_args_list) == 1:
                         args[k] = tag_args_list[0]
@@ -310,8 +308,7 @@ class OptionsTagHandler(BaseOptionsHandler):
                         args[k] = tag_args_list.copy()
             else:
                 if v['required']:
-                    msg = f'Missing parameter "{k}"'
-                    raise RuntimeError(msg)
+                    raise ParameterError(MISS_PARAMETER, arg=k)
         return args
 
     def process_options(self, func: FunctionType, options: List[str]) -> dict:
@@ -332,7 +329,7 @@ class OptionsTagHandler(BaseOptionsHandler):
             if var not in args:
                 if has_tag:
                     msg = 'Cannot define positional parameter after parameter decorated by `Options`.'
-                    raise RuntimeError(msg)
+                    raise DefinitionError(msg)
             else:
                 has_tag = True
 

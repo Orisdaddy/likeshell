@@ -3,6 +3,7 @@ import getpass
 from types import FunctionType
 from typing import Union
 from .context import opt_set
+from .exceptions import DefinitionError
 
 
 class OptStr(object):
@@ -785,7 +786,7 @@ class Options(OptList, OptStr):
             arglen: int = 1
     ):
         if not tag:
-            raise RuntimeError('"tag" cannot be empty')
+            raise DefinitionError('"tag" cannot be empty')
 
         self.tag = tag
         self.arglen = arglen
