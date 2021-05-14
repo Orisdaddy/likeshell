@@ -139,7 +139,7 @@ class CommandHandler:
             task = getattr(self.tasks, option, None)
             if task:
                 if task.__doc__:
-                    output_comment(task.__doc__, color=GREEN)
+                    output_comment(task.__doc__, color=Color.GREEN)
                 else:
                     output('The command description is empty.')
             else:
