@@ -76,3 +76,4 @@ class MyTasks(likeshell.Shell):
 - [无视任务](docs/advanced/Ignore.md)
 - [程序入口](docs/advanced/Main.md)
 - [输入(input)](docs/advanced/Input.md)
+- [可选参数](docs/advanced/Options.md)
