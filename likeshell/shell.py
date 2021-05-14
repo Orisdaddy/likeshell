@@ -29,13 +29,14 @@ class CommandHandler:
             self.help()
 
     def load_parameters(self, func):
-        for t in func.__annotations__.values():
-            if issubclass(t, Options):
-                self.tasks.__options_handler__ = OptionsTagHandler()
-                break
+        if isinstance(self.tasks.__options_handler__, SimpleOptionsHandler):
+            for t in func.__annotations__.values():
+                if issubclass(t, Options):
+                    self.tasks.__options_handler__ = OptionsTagHandler()
+                    break
 
-        if not opt_set.empty:
-            self.tasks.__options_handler__ = OptionsTagHandler()
+            if not opt_set.empty:
+                self.tasks.__options_handler__ = OptionsTagHandler()
 
         if self.tasks.__options_handler__.options_type == 'Queue':
             options = Queue()
