@@ -6,6 +6,7 @@ from types import FunctionType
 from typing import Union, List
 
 from .types import Input, Options
+from .context import opt_set
 
 
 SKIP_GETVALUE = ('Input', )
@@ -146,8 +147,7 @@ class OptionsTagHandler(BaseOptionsHandler):
                     'common_tag': common_tag,
                 }
 
-        tag_context = getattr(func, '__ls_tag__', None)
-
+        tag_context = opt_set.get(func.__name__)
         if tag_context:
             tag_context.update(tag_model_context)
         else:
@@ -304,7 +304,10 @@ class OptionsTagHandler(BaseOptionsHandler):
                     msg = f'"{k}"[{v["common_tag"]}] missing {v["arglen"] - len(tag_args_list)} required parameter{s}'
                     raise RuntimeError(msg)
                 else:
-                    args[k] = tag_args_list.copy()
+                    if len(tag_args_list) == 1:
+                        args[k] = tag_args_list[0]
+                    else:
+                        args[k] = tag_args_list.copy()
             else:
                 if v['required']:
                     msg = f'Missing parameter "{k}"'

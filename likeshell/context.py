@@ -54,3 +54,17 @@ class Ignore(Context):
 
 
 ignore_set = Ignore()
+
+
+class Options(Context):
+    def add(self, func, arg, ctx):
+        if self.context.get(func):
+            self.context[func][arg] = ctx
+        else:
+            self.context[func] = {arg: ctx}
+
+    def get(self, func):
+        return self.context.get(func)
+
+
+opt_set = Options()

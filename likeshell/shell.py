@@ -5,7 +5,7 @@ from queue import Queue
 
 from .console import *
 from .comment import parse_comment
-from .context import alias_set, ignore_set
+from .context import alias_set, ignore_set, opt_set
 from .options import OptionsTagHandler, SimpleOptionsHandler
 from .types import Options
 
@@ -34,7 +34,7 @@ class CommandHandler:
                 self.tasks.__options_handler__ = OptionsTagHandler()
                 break
 
-        if hasattr(func, '__ls_tag__'):
+        if not opt_set.empty:
             self.tasks.__options_handler__ = OptionsTagHandler()
 
         if self.tasks.__options_handler__.options_type == 'Queue':
