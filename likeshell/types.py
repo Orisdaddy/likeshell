@@ -17,15 +17,17 @@ class Input:
     """
     Input
     """
-    def __init__(self, args):
-        self.default = args
+    def __init__(self, prompt, default=None):
+        self.prompt = prompt
+        self.default = default
         self.msg = None
 
     def input(
             self,
             message: str = None,
             callback: FunctionType = None,
-            hide: bool = False
+            hide: bool = False,
+            default=None
     ):
         """
         Get input message.
@@ -34,15 +36,20 @@ class Input:
         :param callback: Requires receive 1 parameter and return 1 parameter
         :param hide: echo turned off, Used for a password
         """
-        message = message or adapt_colon(self.default)
+        message = message or adapt_colon(self.prompt)
+        default = default or self.default
 
         if hide is True:
             result = getpass.getpass(message)
         else:
             result = input(message)
 
+        if not result and default is not None:
+            result = default
+
         if callable(callback):
             result = callback(result)
+
         return result
 
 

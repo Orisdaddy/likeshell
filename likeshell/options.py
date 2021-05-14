@@ -11,6 +11,22 @@ from .types import Input, Options
 SKIP_GETVALUE = ('Input', )
 
 
+def assert_int(a):
+    if not a.isdigit():
+        error = f'"{a}" is not a int'
+        raise TypeError(error)
+    return int(a)
+
+
+def assert_float(a):
+    try:
+        arg = float(a)
+    except ValueError:
+        error = f'"{a}" is not a float'
+        raise TypeError(error)
+    return arg
+
+
 class BaseOptionsHandler:
     options_type = None
 
@@ -32,13 +48,15 @@ class SimpleOptionsHandler(BaseOptionsHandler):
     def validate_options(func: FunctionType, options: Queue, args: list):
         annotation = func.__annotations__
         al = []
+
         for a in args:
             arg_type = annotation.get(a)
 
             if hasattr(arg_type, '__name__') and arg_type.__name__ in SKIP_GETVALUE:
                 arg = None
                 if arg_type.__name__ == 'Input':
-                    arg = Input(a)
+                    default = func.__kwdefaults__.get(a)
+                    arg = Input(a, default=default)
 
                 al.append(arg)
                 continue
@@ -49,22 +67,16 @@ class SimpleOptionsHandler(BaseOptionsHandler):
                 break
 
             if arg_type == int:
-                if arg.isdigit():
-                    arg = int(arg)
-                else:
-                    error = f'"{arg}" is not a int'
-                    raise TypeError(error)
-
-            if arg_type == float:
-                try:
-                    arg = float(arg)
-                except ValueError:
-                    error = f'"{arg}" is not a float'
-                    raise TypeError(error)
+                arg = assert_int(arg)
+            elif arg_type == float:
+                arg = assert_float(arg)
 
             al.append(arg)
 
             if options.empty():
+                break
+            else:
+                options.full()
                 break
 
         for i in al:
@@ -76,6 +88,7 @@ class SimpleOptionsHandler(BaseOptionsHandler):
             args_count += 1
         # pop up self & variables.
         args = list(func.__code__.co_varnames[1: args_count])
+
         if func.__kwdefaults__:
             for k in func.__kwdefaults__.keys():
                 args.append(k)
@@ -166,8 +179,10 @@ class OptionsTagHandler(BaseOptionsHandler):
         return tag_context
 
     @staticmethod
-    def validate_type(annotation: dict, args: dict):
+    def validate_type(func, args: dict):
+        annotation = func.__annotations__
         result = {}
+
         for k, v in args.items():
             arg_type = annotation.get(k)
             arg = v
@@ -175,49 +190,37 @@ class OptionsTagHandler(BaseOptionsHandler):
             if hasattr(arg_type, '__name__') and arg_type.__name__ in SKIP_GETVALUE:
                 arg = None
                 if arg_type.__name__ == 'Input':
-                    arg = Input(k)
+                    default = func.__kwdefaults__.get(k)
+                    arg = Input(k, default=default)
 
                 result[k] = arg
                 continue
 
-            if arg_type == int:
-                if isinstance(v, str):
-                    if v.isdigit():
-                        arg = int(v)
-                    else:
-                        error = f'"{v}" is not a int'
-                        raise TypeError(error)
-                elif isinstance(v, list):
-                    arg = []
-                    for i in v:
-                        if i.isdigit():
-                            i = int(i)
-                        else:
-                            error = f'"{i}" is not a int'
-                            raise TypeError(error)
-                        arg.append(i)
+            if isinstance(v, str):
+                if arg_type == int:
+                    arg = assert_int(v)
+                elif arg_type == float:
+                    arg = assert_float(v)
 
-            if arg_type == float:
-                if isinstance(v, str):
-                    try:
-                        arg = float(v)
-                    except ValueError:
-                        error = f'"{v}" is not a float'
-                        raise TypeError(error)
-                elif isinstance(v, list):
-                    arg = []
-                    for i in v:
-                        try:
-                            i = float(i)
-                        except ValueError:
-                            error = f'"{i}" is not a float'
-                            raise TypeError(error)
-                        arg.append(i)
+            elif isinstance(v, list):
+                arg = []
+                for i in v:
+                    if arg_type == int:
+                        i = assert_int(i)
+                    elif arg_type == float:
+                        i = assert_float(i)
+                    arg.append(i)
+
             result[k] = arg
         return result
 
     def get_positional_parameters(self, context, opts, func):
-        varnames = list(func.__code__.co_varnames[1:])
+        args_count = func.__code__.co_argcount
+        if func.__kwdefaults__:
+            args_count += len(func.__kwdefaults__)
+
+        varnames = list(func.__code__.co_varnames[1: args_count])
+
         for key in context.keys():
             varnames.remove(key)
 
@@ -228,6 +231,7 @@ class OptionsTagHandler(BaseOptionsHandler):
             pos_args.append(p)
 
         args = {}
+
         for i in varnames[:]:
             var_type = func.__annotations__.get(i)
             if var_type and hasattr(var_type, '__name__') and var_type.__name__ == 'Input':
@@ -308,6 +312,10 @@ class OptionsTagHandler(BaseOptionsHandler):
         return args
 
     def process_options(self, func: FunctionType, options: List[str]) -> dict:
+        args_count = func.__code__.co_argcount
+        if func.__kwdefaults__:
+            args_count += len(func.__kwdefaults__)
+
         context = self.process_context(func)
 
         pos_args = self.get_positional_parameters(context, options, func)
@@ -317,7 +325,7 @@ class OptionsTagHandler(BaseOptionsHandler):
         args.update(pos_args)
 
         has_tag = False
-        for var in func.__code__.co_varnames[1:]:
+        for var in func.__code__.co_varnames[1: args_count]:
             if var not in args:
                 if has_tag:
                     msg = 'Cannot define positional parameter after parameter decorated by `Options`.'
@@ -325,6 +333,6 @@ class OptionsTagHandler(BaseOptionsHandler):
             else:
                 has_tag = True
 
-        args = self.validate_type(func.__annotations__, args)
+        args = self.validate_type(func, args)
 
         return args
