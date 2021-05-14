@@ -1,3 +1,6 @@
+from .exceptions import DefinitionError
+
+
 class Context:
     def __init__(self, context=None):
         if context is None:
@@ -14,7 +17,8 @@ class Alias(Context):
     def add(self, name, f):
         af = self.get(name)
         if af and af != f:
-            raise RuntimeError(f'The aliases of "{af}" and "{f}" are duplicated')
+            msg = f'The aliases of "{af}" and "{f}" are duplicated'
+            raise DefinitionError(msg)
         self.context[name] = f
 
     def pop(self, name):
