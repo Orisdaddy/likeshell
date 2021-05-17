@@ -57,7 +57,7 @@ class SimpleOptionsHandler(BaseOptionsHandler):
             if hasattr(arg_type, '__name__') and arg_type.__name__ in SKIP_GETVALUE:
                 arg = None
                 if arg_type.__name__ == 'Input':
-                    default = func.__kwdefaults__.get(a)
+                    default = func.__kwdefaults__.get(a) if func.__kwdefaults__ else None
                     arg = Input(a, default=default)
 
                 al.append(arg)
