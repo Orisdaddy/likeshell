@@ -1,4 +1,4 @@
-name: Python Test
+name: Python test for Windows
 
 on:
   push:
@@ -8,17 +8,14 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.7
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: '3.7'
     - name: Install dependencies
       run: pip install coverage
     - name: Test with unittest
@@ -26,5 +23,3 @@ jobs:
         make test
         coverage combine
         coverage report
-    - name: CodeCov
-      run: bash <(curl -s https://codecov.io/bash) -F
