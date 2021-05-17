@@ -23,6 +23,12 @@ jobs:
       run: pip install pytest coverage
     - name: Test with unittest
       run: |
-        coverage run -m pytest tests/test_*
+        coverage run -p -m unittest tests/test_alias.py
+        coverage run -p -m unittest tests/test_basic.py
+        coverage run -p -m unittest tests/test_ignore.py
+        coverage run -p -m unittest tests/test_options.py
+        coverage run -p -m unittest tests/test_params.py
+        coverage combine
+        coverage report
     - name: CodeCov
       run: bash <(curl -s https://codecov.io/bash) -F

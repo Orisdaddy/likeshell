@@ -6,7 +6,7 @@ from .context import opt_set
 from .exceptions import DefinitionError
 
 
-class OptStr(object):
+class OptStr:
     """
     str(object='') -> str
     str(bytes_or_buffer[, encoding[, errors]]) -> str
@@ -479,10 +479,6 @@ class OptStr(object):
         """
         return ""
 
-    def __getattribute__(self, *args, **kwargs):
-        """ Return getattr(self, name). """
-        pass
-
     def __getitem__(self, *args, **kwargs):
         """ Return self[key]. """
         pass
@@ -500,22 +496,6 @@ class OptStr(object):
 
     def __hash__(self, *args, **kwargs):
         """ Return hash(self). """
-        pass
-
-    def __init__(self, value='', encoding=None, errors='strict'):
-        """
-        str(object='') -> str
-        str(bytes_or_buffer[, encoding[, errors]]) -> str
-
-        Create a new string object from the given object. If encoding or
-        errors is specified, then the object must expose a data buffer
-        that will be decoded using the given encoding and error handler.
-        Otherwise, returns the result of object.__str__() (if defined)
-        or repr(object).
-        encoding defaults to sys.getdefaultencoding().
-        errors defaults to 'strict'.
-        # (copied from class doc)
-        """
         pass
 
     def __iter__(self, *args, **kwargs):
@@ -540,11 +520,6 @@ class OptStr(object):
 
     def __mul__(self, *args, **kwargs):
         """ Return self*value. """
-        pass
-
-    @staticmethod
-    def __new__(*args, **kwargs):
-        """ Create and return a new object.  See help(type) for accurate signature. """
         pass
 
     def __ne__(self, *args, **kwargs):
@@ -642,10 +617,6 @@ class OptList:
         """ Return self==value. """
         pass
 
-    def __getattribute__(self, *args, **kwargs):
-        """ Return getattr(self, name). """
-        pass
-
     def __getitem__(self, y):
         """ x.__getitem__(y) <==> x[y] """
         pass
@@ -666,14 +637,6 @@ class OptList:
         """ Implement self*=value. """
         pass
 
-    def __init__(self, seq=()):
-        """
-        list() -> new empty list
-        list(iterable) -> new list initialized from iterable's items
-        # (copied from class doc)
-        """
-        pass
-
     def __iter__(self, *args, **kwargs):
         """ Implement iter(self). """
         pass
@@ -692,11 +655,6 @@ class OptList:
 
     def __mul__(self, *args, **kwargs):
         """ Return self*value. """
-        pass
-
-    @staticmethod
-    def __new__(*args, **kwargs):
-        """ Create and return a new object.  See help(type) for accurate signature. """
         pass
 
     def __ne__(self, *args, **kwargs):
@@ -722,8 +680,6 @@ class OptList:
     def __sizeof__(self):
         """ L.__sizeof__() -- size of L in memory, in bytes """
         pass
-
-    __hash__ = None
 
 
 def adapt_colon(msg):
