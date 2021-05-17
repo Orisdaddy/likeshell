@@ -53,7 +53,6 @@ class SimpleOptionsHandler(BaseOptionsHandler):
 
         for a in args:
             arg_type = annotation.get(a)
-
             if hasattr(arg_type, '__name__') and arg_type.__name__ in SKIP_GETVALUE:
                 arg = None
                 if arg_type.__name__ == 'Input':
@@ -74,9 +73,6 @@ class SimpleOptionsHandler(BaseOptionsHandler):
                 arg = assert_float(arg)
 
             al.append(arg)
-
-            if options.empty():
-                break
 
         options.full()
         for i in al:
@@ -171,7 +167,6 @@ class OptionsTagHandler(BaseOptionsHandler):
                         tag_list.append(v['tag'])
 
                 tag_context[k]['required'] = True
-
                 if func.__kwdefaults__ and k in func.__kwdefaults__:
                     tag_context[k]['required'] = False
         return tag_context
@@ -257,6 +252,12 @@ class OptionsTagHandler(BaseOptionsHandler):
                     if t in opts:
                         index = opts.index(t)
 
+            if index is None:
+                if v.get('required', False) is False:
+                    continue
+                else:
+                    raise ParameterError(MISS_PARAMETER, arg=k)
+
             params = []
             for p in opts[index + 1:]:
                 if self.find_tag(p, tmp_context):
@@ -316,23 +317,27 @@ class OptionsTagHandler(BaseOptionsHandler):
         if func.__kwdefaults__:
             args_count += len(func.__kwdefaults__)
 
+        if args_count != len(func.__code__.co_varnames):
+            msg = 'Parameters after `*` need to define default value'
+            raise DefinitionError(msg)
+
         context = self.process_context(func)
+
+        has_tag = False
+        for var in func.__code__.co_varnames[1: args_count]:
+            found = False if not context.get(var) else True
+            if found is False:
+                if has_tag:
+                    msg = 'Cannot define positional parameter after parameter decorated by `Options`.'
+                    raise DefinitionError(msg)
+            else:
+                has_tag = found
 
         pos_args = self.get_positional_parameters(context, options, func)
         tag_args = self.get_tag_parameters(context, options)
         args = self.validate_tag_parameters(tag_args, context)
 
         args.update(pos_args)
-
-        has_tag = False
-        for var in func.__code__.co_varnames[1: args_count]:
-            if var not in args:
-                if has_tag:
-                    msg = 'Cannot define positional parameter after parameter decorated by `Options`.'
-                    raise DefinitionError(msg)
-            else:
-                has_tag = True
-
         args = self.validate_type(func, args)
 
         return args
