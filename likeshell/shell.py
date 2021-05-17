@@ -36,7 +36,7 @@ class CommandHandler:
                     self.tasks.__options_handler__ = OptionsTagHandler()
                     break
 
-            if not opt_set.empty:
+            if not opt_set.empty and opt_set.get(func.__name__):
                 self.tasks.__options_handler__ = OptionsTagHandler()
 
         if self.tasks.__options_handler__.options_type == 'Queue':
