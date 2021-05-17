@@ -27,4 +27,4 @@ jobs:
         coverage combine
         coverage report
     - name: CodeCov
-      run: bash <(curl -s https://codecov.io/bash) -F
+      run: bash <(curl -s https://codecov.io/bash) -F ${{ secrets.CODECOV_TOKEN }}

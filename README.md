@@ -1,6 +1,9 @@
 # likeshell
 
 [![PyPI version](https://badge.fury.io/py/likeshell.svg)](https://badge.fury.io/py/likeshell)
+[![Actions Status](https://github.com/Orisdaddy/likeshell/workflows/Python%20Test/badge.svg)](https://github.com/Orisdaddy/likeshell/actions)
+[![codecov](https://codecov.io/gh/Orisdaddy/likeshell/branch/master/graph/badge.svg)](https://codecov.io/gh/Orisdaddy/likeshell)
+
 
 likeshell 快速构建自己的命令行工具，扩展性强、可配置、开箱即用、干净整洁，
 只需一步构建自己的CLI。
