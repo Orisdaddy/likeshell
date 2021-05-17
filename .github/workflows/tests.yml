@@ -29,6 +29,7 @@ jobs:
         coverage run -p -m unittest tests/test_options.py
         coverage run -p -m unittest tests/test_params.py
         coverage run -p -m unittest tests/test_input.py
+        coverage run -p -m unittest tests/test_complex.py
         coverage combine
         coverage report
     - name: CodeCov
