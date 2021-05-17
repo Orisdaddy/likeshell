@@ -6,6 +6,11 @@ from likeshell.shell import run_cls
 from likeshell.exceptions import DefinitionError
 
 
+class Arg1(likeshell.Options):
+    arglen = 2
+    tag = '-a'
+
+
 class MyTask(likeshell.Main):
     @likeshell.Options(arg='a1', tag='-a')
     def options(self, a1):
@@ -16,6 +21,10 @@ class MyTask(likeshell.Main):
     def mul_options(self, a1):
         assert a1 == ['arg1', 'arg2']
         raise RuntimeError('run task2')
+
+    def model_options(self, a1: Arg1):
+        assert a1 == ['arg1', 'arg2']
+        raise RuntimeError('run task3')
 
 
 def run():
@@ -52,3 +61,11 @@ class TestOptions(unittest.TestCase):
             assert False
         except DefinitionError as e:
             self.assertEqual('"a1" takes 2 parameters but 3 were given', str(e))
+
+    def test_model_options(self):
+        sys.argv = ['test.py', 'model_options', '-a', 'arg1', 'arg2']
+        try:
+            run()
+            assert False
+        except RuntimeError as e:
+            self.assertEqual('run task3', str(e))
