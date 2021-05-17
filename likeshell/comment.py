@@ -1,8 +1,6 @@
 import os
 
 ITEM = ('alias', 'options')
-nl = os.linesep
-
 
 def parse_item(content, item):
     if item == 'alias':
@@ -21,6 +19,14 @@ def parse_comment(doc):
     meta = {
         'alias': None
     }
+
+    if '\r\n' in doc:
+        nl = '\r\n'
+    elif '\n' in doc:
+        nl = '\n'
+    else:
+        nl = os.linesep
+
     lines = doc.split(nl)
     for line in lines:
         line = line.strip()
