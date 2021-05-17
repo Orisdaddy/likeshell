@@ -71,7 +71,7 @@ def run():
     run_cls(MyTask, MyTask.__dict__)
 
 
-class TestBasic(unittest.TestCase):
+class TestComplex(unittest.TestCase):
     def test_task1(self):
         # task1
         sys.argv = ['test.py', 'task1', 'arg1', 'arg2', 'arg3', 'arg4', 'arg5']
