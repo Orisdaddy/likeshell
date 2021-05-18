@@ -70,7 +70,6 @@ class MyTasks(likeshell.Shell):
 - [基本使用](docs/basic/Usage.md)
 - [参数](docs/basic/Parameter.md)
 - [钩子](docs/basic/Hook.md)
-- [配置](docs/basic/Config.md)
 - [帮助](docs/basic/Help.md)
 
 ### 高级功能
@@ -80,3 +79,4 @@ class MyTasks(likeshell.Shell):
 - [程序入口](docs/advanced/Main.md)
 - [输入(input)](docs/advanced/Input.md)
 - [可选参数](docs/advanced/Options.md)
+- [配置](docs/advanced/Config.md)

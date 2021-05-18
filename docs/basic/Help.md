@@ -1,6 +1,6 @@
 # 帮助
 
-通过`-h`获得方法相关的提示
+通过`-h`或`--help`获得方法相关的提示
 
 ```python
 import likeshell
@@ -8,6 +8,7 @@ import likeshell
 class MyTasks(likeshell.Shell):
     def task1(self, s1, i1, f1):
         """
+        定义多行注释，help会将其作为命令说明打印
         task1说明:
             task1 takes 3 arguments
         """
@@ -36,6 +37,7 @@ class MyTasks(likeshell.Shell):
       task2
 
 >> python demo.py -h task1
-<< task1说明:
+<< 定义多行注释，help会将其作为命令说明打印
+   task1说明:
        task1 takes 3 arguments
 ```
