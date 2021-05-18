@@ -1,12 +1,24 @@
 from .exceptions import DefinitionError
 
 
+def empty_set():
+    opt_set.full()
+    alias_set.full()
+    ignore_set.full([])
+
+
 class Context:
     def __init__(self, context=None):
         if context is None:
             self.context = {}
         else:
             self.context = context
+
+    def full(self, ctx=None):
+        if ctx is not None:
+            self.context = ctx
+        else:
+            self.context = {}
 
     @property
     def empty(self):

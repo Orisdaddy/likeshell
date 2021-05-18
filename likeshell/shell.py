@@ -161,7 +161,7 @@ class CommandHandler:
         sys.exit()
 
 
-def run_cls(cls, dic):
+def run_cls(cls, dic, what=None, ex=None):
     args = sys.argv[1:]
     tasks = {
         k: v for k, v in dic.items()

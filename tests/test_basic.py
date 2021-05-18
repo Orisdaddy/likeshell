@@ -54,6 +54,13 @@ class TestBasic(unittest.TestCase):
         except SystemExit:
             pass
 
+        sys.argv = ['test.py', '-h', 'task1']
+        try:
+            run()
+            assert False
+        except SystemExit:
+            pass
+
     def test_param(self):
         sys.argv = ['test.py', 'params', 'hello', 'world', '!']
         run()

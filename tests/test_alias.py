@@ -3,6 +3,7 @@ import likeshell
 import unittest
 
 from likeshell.shell import run_cls
+from likeshell.exceptions import DefinitionError
 
 
 class MyTask(likeshell.Main):
@@ -16,6 +17,13 @@ class MyTask(likeshell.Main):
         :alias a2
         """
         raise RuntimeError('run task2')
+
+    def alias3(self):
+        """
+        run alias3
+        :alias: a3
+        """
+        raise RuntimeError('run task3')
 
 
 def run():
@@ -31,6 +39,13 @@ class TestAlias(unittest.TestCase):
         except RuntimeError as e:
             self.assertEqual('run task1', str(e))
 
+        sys.argv = ['test.py', '-h', 'runalias']
+        try:
+            run()
+            assert False
+        except SystemExit:
+            pass
+
     def test_alias2(self):
         sys.argv = ['test.py', 'a2']
         try:
@@ -38,3 +53,25 @@ class TestAlias(unittest.TestCase):
             assert False
         except RuntimeError as e:
             self.assertEqual('run task2', str(e))
+
+    def test_alias3(self):
+        sys.argv = ['test.py', 'a3']
+        try:
+            run()
+            assert False
+        except RuntimeError as e:
+            self.assertEqual('run task3', str(e))
+
+    def test_tag_missing(self):
+        sys.argv = ['test.py']
+        try:
+            class TestTask(likeshell.Shell):
+                @likeshell.alias('alias')
+                def alias1(self):
+                    pass
+
+                @likeshell.alias('alias')
+                def alias2(self):
+                    pass
+        except DefinitionError as e:
+            self.assertEqual('The aliases of "alias1" and "alias2" are duplicated', str(e))

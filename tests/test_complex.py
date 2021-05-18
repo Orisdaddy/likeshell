@@ -3,7 +3,7 @@ import likeshell
 import unittest
 
 from likeshell.shell import run_cls
-from likeshell import exceptions
+from likeshell.exceptions import DefinitionError
 
 
 class MyTask(likeshell.Main):
@@ -64,7 +64,27 @@ class MyTask(likeshell.Main):
         assert a1 == 'arg1'
         assert a2 == 'arg2'
         assert a3 == 'default val'
-        raise RuntimeError('run task4')
+        raise RuntimeError('run task5')
+
+    @likeshell.Options(tag='--arg2', arg='a2')
+    @likeshell.Options(tag='--arg3', arg='a3')
+    @likeshell.Options(tag='--arg4', arg='a4', arglen=2)
+    @likeshell.Options(tag='--arg5', arg='a5', arglen=2)
+    def task6(
+            self,
+            a1,
+            a2: int,
+            a3: float,
+            a4: int,
+            *,
+            a5: float = [10.1, 20.2]
+    ):
+        assert a1 == 'arg1'
+        assert a2 == 10
+        assert a3 == 10.1
+        assert a4 == [10, 20]
+        assert a5 == [10.1, 20.2]
+        raise RuntimeError('run task6')
 
 
 def run():
@@ -124,9 +144,18 @@ class TestComplex(unittest.TestCase):
 
     def test_task5(self):
         # task5
-        sys.argv = ['test.py', 'task4', 'arg1', '--arg2', 'arg2']
+        sys.argv = ['test.py', 'task5', 'arg1', '--arg2', 'arg2']
         try:
             run()
             assert False
         except RuntimeError as e:
-            self.assertEqual('run task4', str(e))
+            self.assertEqual('run task5', str(e))
+
+    def test_task6(self):
+        # task5
+        sys.argv = ['test.py', 'task6', 'arg1', '--arg2', '10', '--arg3', '10.1', '--arg4', '10', '20']
+        try:
+            run()
+            assert False
+        except RuntimeError as e:
+            self.assertEqual('run task6', str(e))
