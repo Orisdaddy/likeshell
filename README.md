@@ -1,7 +1,7 @@
 # likeshell
 
 [![PyPI version](https://badge.fury.io/py/likeshell.svg)](https://badge.fury.io/py/likeshell)
-[![Actions Status](https://github.com/Orisdaddy/likeshell/workflows/Python%20Test/badge.svg)](https://github.com/Orisdaddy/likeshell/actions)
+[![Actions Status](https://github.com/Orisdaddy/likeshell/workflows/Macos%20Test/badge.svg)](https://github.com/Orisdaddy/likeshell/actions)
 [![codecov](https://codecov.io/gh/Orisdaddy/likeshell/branch/master/graph/badge.svg)](https://codecov.io/gh/Orisdaddy/likeshell)
 
 
