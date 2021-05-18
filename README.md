@@ -1,6 +1,9 @@
 # likeshell
 
 [![PyPI version](https://badge.fury.io/py/likeshell.svg)](https://badge.fury.io/py/likeshell)
+[![Supported Versions](https://img.shields.io/pypi/pyversions/likeshell.svg)](https://pypi.org/project/likeshell)
+[![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 [![Actions Status](https://github.com/Orisdaddy/likeshell/workflows/Macos%20Test/badge.svg)](https://github.com/Orisdaddy/likeshell/actions)
 [![codecov](https://codecov.io/gh/Orisdaddy/likeshell/branch/master/graph/badge.svg)](https://codecov.io/gh/Orisdaddy/likeshell)
 
