@@ -8,6 +8,9 @@ from likeshell import exceptions
 
 class MyTask(likeshell.Main):
     def task(self):
+        """
+        task comment
+        """
         raise RuntimeError('run task')
 
     def params(
@@ -37,6 +40,20 @@ class TestBasic(unittest.TestCase):
         except RuntimeError as e:
             self.assertEqual('run task', str(e))
 
+        sys.argv = ['test.py']
+        try:
+            run()
+            assert False
+        except SystemExit:
+            pass
+
+        sys.argv = ['test.py', '-h', 'task']
+        try:
+            run()
+            assert False
+        except SystemExit:
+            pass
+
     def test_param(self):
         sys.argv = ['test.py', 'params', 'hello', 'world', '!']
         run()
@@ -61,3 +78,5 @@ class TestBasic(unittest.TestCase):
             assert False
         except exceptions.ParameterError as e:
             self.assertEqual('MissingParameter: arg3.', str(e))
+
+

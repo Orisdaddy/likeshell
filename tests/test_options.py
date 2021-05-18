@@ -22,9 +22,14 @@ class MyTask(likeshell.Main):
         assert a1 == ['arg1', 'arg2']
         raise RuntimeError('run task2')
 
-    def model_options(self, a1: Arg1):
+    @likeshell.Options(arg='a1', tag=('-a', '--arg1'), arglen=2)
+    def mul_tag_options(self, a1):
         assert a1 == ['arg1', 'arg2']
         raise RuntimeError('run task3')
+
+    def model_options(self, a1: Arg1):
+        assert a1 == ['arg1', 'arg2']
+        raise RuntimeError('run task4')
 
 
 def run():
@@ -62,10 +67,25 @@ class TestOptions(unittest.TestCase):
         except DefinitionError as e:
             self.assertEqual('"a1" takes 2 parameters but 3 were given', str(e))
 
+    def test_mul_tag_options(self):
+        sys.argv = ['test.py', 'mul_tag_options', '-a', 'arg1', 'arg2']
+        try:
+            run()
+            assert False
+        except RuntimeError as e:
+            self.assertEqual('run task3', str(e))
+
+        sys.argv = ['test.py', 'mul_tag_options', '--arg1', 'arg1', 'arg2']
+        try:
+            run()
+            assert False
+        except RuntimeError as e:
+            self.assertEqual('run task3', str(e))
+
     def test_model_options(self):
         sys.argv = ['test.py', 'model_options', '-a', 'arg1', 'arg2']
         try:
             run()
             assert False
         except RuntimeError as e:
-            self.assertEqual('run task3', str(e))
+            self.assertEqual('run task4', str(e))
