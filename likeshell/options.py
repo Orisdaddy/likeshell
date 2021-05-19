@@ -19,6 +19,13 @@ def is_input(o):
 
     if hasattr(o, '__name__') and o.__name__ == 'Input':
         return True
+    return False
+
+
+def is_options(o):
+    if isinstance(o, Options):
+        return True
+    return False
 
 
 def assert_int(a):
@@ -57,6 +64,7 @@ class SimpleOptionsHandler(BaseOptionsHandler):
     @staticmethod
     def validate_options(func: FunctionType, options: Queue, args: list):
         annotation = func.__annotations__
+
         al = []
         for a in args:
             arg_type = annotation.get(a)
@@ -140,18 +148,12 @@ class OptionsTagHandler(BaseOptionsHandler):
 
         tag_model_context = {}
         for arg, t in annotation.items():
-            if issubclass(t, Options):
-                if isinstance(t.tag, str):
-                    common_tag = t.tag
-                elif isinstance(t.tag, (tuple, list)) and t.tag:
-                    common_tag = t.tag[0]
-                else:
-                    common_tag = str(t.tag)
-
+            if is_options(t):
+                t.arg = arg
                 tag_model_context[arg] = {
                     'arglen': t.arglen,
                     'tag': t.tag,
-                    'common_tag': common_tag,
+                    'common_tag': t.common_tag,
                 }
 
         tag_context = opt_set.get(func.__name__)
@@ -183,7 +185,7 @@ class OptionsTagHandler(BaseOptionsHandler):
                 if func.__kwdefaults__ and k in func.__kwdefaults__:
                     tag_context[k]['required'] = False
 
-                if func.__annotations__.get(k) and is_input(func.__annotations__[k]):
+                if func.__annotations__.get(k) is not None and is_input(func.__annotations__[k]):
                     msg = 'Parameter decorated by `Options` cannot be defined as `Input` parameter'
                     raise DefinitionError(msg)
         return tag_context

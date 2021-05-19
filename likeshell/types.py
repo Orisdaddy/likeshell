@@ -64,13 +64,13 @@ class Input:
         self.__dict__[key] = value
 
 
-class Options(OptList, OptStr):
+class Options:
     tag: Union[str, list] = None
     arglen: int = 1
 
     def __init__(
             self,
-            arg: str,
+            arg: str = None,
             tag: Union[str, list, tuple] = None,
             arglen: int = 1
     ):
@@ -105,6 +105,12 @@ class Options(OptList, OptStr):
             tag = str(self.tag)
             self.set_tag(func.__name__, tag)
         return func
+
+    def __repr__(self):
+        return '<object "options">'
+
+    def __str__(self):
+        return '<object "options">'
 
 
 class Enumerate:

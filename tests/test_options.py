@@ -6,16 +6,6 @@ from likeshell.shell import run_cls
 from likeshell.exceptions import DefinitionError, ParameterError
 
 
-class Arg1(likeshell.Options):
-    arglen = 2
-    tag = '-a'
-
-
-class MulTagArg1(likeshell.Options):
-    arglen = 2
-    tag = ('-a', '--arg1')
-
-
 class MyTask(likeshell.Main):
     @likeshell.Options(arg='a1', tag='-a')
     def options(self, a1):
@@ -32,11 +22,11 @@ class MyTask(likeshell.Main):
         assert a1 == ['arg1', 'arg2']
         raise RuntimeError('run task3')
 
-    def model_options(self, a1: Arg1):
+    def type_options(self, a1: likeshell.Options(tag='-a', arglen=2)):
         assert a1 == ['arg1', 'arg2']
         raise RuntimeError('run task4')
 
-    def model_mul_tag_options(self, a1: MulTagArg1):
+    def type_mul_tag_options(self, a1: likeshell.Options(tag=['-a', '--arg1'], arglen=2)):
         assert a1 == ['arg1', 'arg2']
         raise RuntimeError('run task5')
 
@@ -98,23 +88,23 @@ class TestOptions(unittest.TestCase):
         except RuntimeError as e:
             self.assertEqual('run task3', str(e))
 
-    def test4_model_options(self):
-        sys.argv = ['test.py', 'model_options', '-a', 'arg1', 'arg2']
+    def test4_type_options(self):
+        sys.argv = ['test.py', 'type_options', '-a', 'arg1', 'arg2']
         try:
             run()
             assert False
         except RuntimeError as e:
             self.assertEqual('run task4', str(e))
 
-    def test5_model_mul_tag_options(self):
-        sys.argv = ['test.py', 'model_mul_tag_options', '-a', 'arg1', 'arg2']
+    def test5_type_mul_tag_options(self):
+        sys.argv = ['test.py', 'type_mul_tag_options', '-a', 'arg1', 'arg2']
         try:
             run()
             assert False
         except RuntimeError as e:
             self.assertEqual('run task5', str(e))
 
-        sys.argv = ['test.py', 'model_mul_tag_options', '--arg1', 'arg1', 'arg2']
+        sys.argv = ['test.py', 'type_mul_tag_options', '--arg1', 'arg1', 'arg2']
         try:
             run()
             assert False
