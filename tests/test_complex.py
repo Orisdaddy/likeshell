@@ -92,7 +92,7 @@ def run():
 
 
 class TestComplex(unittest.TestCase):
-    def test_task1(self):
+    def test1_task1(self):
         # task1
         sys.argv = ['test.py', 'task1', 'arg1', 'arg2', 'arg3', 'arg4', 'arg5']
         try:
@@ -101,7 +101,7 @@ class TestComplex(unittest.TestCase):
         except RuntimeError as e:
             self.assertEqual('run task1', str(e))
 
-    def test_task2(self):
+    def test2_task2(self):
         # task2
         sys.argv = ['test.py', 'task2', 'arg1']
         try:
@@ -110,7 +110,7 @@ class TestComplex(unittest.TestCase):
         except RuntimeError as e:
             self.assertEqual('run task2', str(e))
 
-    def test_task3(self):
+    def test3_task3(self):
         # task3
         sys.argv = ['test.py', 'task3', 'arg1']
         try:
@@ -126,7 +126,7 @@ class TestComplex(unittest.TestCase):
         except RuntimeError as e:
             self.assertEqual('run task3', str(e))
 
-    def test_task4(self):
+    def test4_task4(self):
         # task4
         sys.argv = ['test.py', 'task4', 'arg1', '--arg2', 'arg2']
         try:
@@ -142,7 +142,7 @@ class TestComplex(unittest.TestCase):
         except RuntimeError as e:
             self.assertEqual('run task4', str(e))
 
-    def test_task5(self):
+    def test5_task5(self):
         # task5
         sys.argv = ['test.py', 'task5', 'arg1', '--arg2', 'arg2']
         try:
@@ -151,7 +151,7 @@ class TestComplex(unittest.TestCase):
         except RuntimeError as e:
             self.assertEqual('run task5', str(e))
 
-    def test_task6(self):
+    def test6_task6(self):
         # task5
         sys.argv = ['test.py', 'task6', 'arg1', '--arg2', '10', '--arg3', '10.1', '--arg4', '10', '20']
         try:
@@ -159,3 +159,35 @@ class TestComplex(unittest.TestCase):
             assert False
         except RuntimeError as e:
             self.assertEqual('run task6', str(e))
+
+    def test7_definition_error(self):
+        from likeshell.context import empty_set
+
+        empty_set()
+        # Options and Input
+        sys.argv = ['test.py', 'task7', '--arg', 'arg1']
+        try:
+            class Task(likeshell.Shell):
+                @likeshell.Options(tag='--arg', arg='a1')
+                def task7(
+                        self,
+                        a1: likeshell.Input,
+                ):
+                    raise RuntimeError('run task7')
+        except DefinitionError as e:
+            self.assertEqual('Parameter decorated by `Options` cannot be defined as `Input` parameter', str(e))
+
+        empty_set()
+
+        sys.argv = ['test.py', 'task7', '--arg', 'arg1']
+        try:
+            class Task(likeshell.Shell):
+                @likeshell.Options(tag='--arg', arg='a1')
+                def task7(
+                        self,
+                        a1,
+                        a2: likeshell.Input,
+                ):
+                    raise RuntimeError('run task7')
+        except RuntimeError as e:
+            self.assertEqual('run task7', str(e))
