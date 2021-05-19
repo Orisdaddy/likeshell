@@ -26,6 +26,10 @@ class MyTask(likeshell.Main):
         if arg3 != '!':
             raise ValueError(f'arg3 != !')
 
+    def execute(self):
+        self.cmd('git branch')
+        likeshell.cmd('git branch')
+
 
 def run():
     run_cls(MyTask, MyTask.__dict__)
@@ -86,4 +90,12 @@ class TestBasic(unittest.TestCase):
         except exceptions.ParameterError as e:
             self.assertEqual('MissingParameter: arg3.', str(e))
 
+    def test_execute(self):
+        sys.argv = ['test.py', 'execute']
+        run()
 
+        sys.argv = ['test.py', 'cmd']
+        try:
+            run()
+        except exceptions.CommandError as e:
+            self.assertEqual('CommandNotFound', e.code)
