@@ -18,13 +18,13 @@ current_version = url[-1].split('.')
 
 version = importlib.import_module('likeshell.__version__').__version__.split('.')
 
-if current_version[0] < version[0]:
+if int(current_version[0]) < int(version[0]):
     upload_package()
 
-if current_version[1] < version[1]:
+if int(current_version[1]) < int(version[1]):
     upload_package()
 
-if current_version[2] < version[2]:
+if int(current_version[2]) < int(version[2]):
     upload_package()
 
 print('No release.')
