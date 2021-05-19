@@ -14,8 +14,7 @@ class MyTasks(likeshell.Shell):
             a: likeshell.Input  # 定义类型为 likeshell.Input
         ):
         print('run task1')
-        res = a.input()  # .input()方法开始输入
-        print(res)
+        print(a)
 ```
 
 ```shell script
@@ -32,33 +31,36 @@ class MyTasks(likeshell.Shell):
 import likeshell
 
 
+def valid(arg):
+    arg += '!'
+    return arg
+
+
 class MyTasks(likeshell.Shell):
     def task1(
             self,
             a: str,
-            b: likeshell.Input,
+            b: likeshell.Input(prompt='username:', default='default', hide=False, callback=valid),
             c: str
     ):
-        def valid(arg):
-            arg += '!'
-            return arg
-
+        """
+        参数说明
+            :prompt: 输入时显示的提示字符串
+            :default: 输入为空时 使用默认值
+            :hide: 隐藏输入内容
+            :callback: 回调函数 要求接收一个参数 返回一个参数
+        """
         print('run task1')
-        res = b.input(
-            message='username:',  # message: 输入提示信息
-            callback=valid,  # callback: 接收一个回调函数 接收一个参数，返回一个参数
-            hide=True  # hide: 隐藏输入的内容
-        )
         print(a)
-        print(res)
+        print(b)
         print(c)
 ```
 
 ```shell script
 >> python demo.py task1 astr cstr
-<< run task1
 >> username: joker
-<< astr
+<< run task1
+   astr
    joker!
    cstr
 ```

@@ -83,3 +83,4 @@ class MyTasks(likeshell.Shell):
 - [输入(input)](docs/advanced/Input.md)
 - [可选参数](docs/advanced/Options.md)
 - [配置](docs/advanced/Config.md)
+- [命令执行](docs/advanced/ExecuteCommand.md)
