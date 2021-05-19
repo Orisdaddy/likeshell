@@ -9,6 +9,7 @@ from .context import alias_set, ignore_set, opt_set
 from .options import OptionsTagHandler, SimpleOptionsHandler
 from .types import Options
 from .exceptions import CommandError, COMMAND_NOT_FOUND
+from .util import cmd
 
 from typing import Optional
 
@@ -190,6 +191,15 @@ class GsMeta(type):
 class Main:
     __options_handler__ = SimpleOptionsHandler()
     __default_bash__: str = None
+
+    ignore_set.add('__options_handler__')
+    ignore_set.add('__default_bash__')
+    ignore_set.add('__before__')
+    ignore_set.add('__after__')
+    ignore_set.add('cmd')
+
+    def cmd(self, *args, **kwargs):
+        cmd(*args, **kwargs)
 
     def __before__(self):
         pass
