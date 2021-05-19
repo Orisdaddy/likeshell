@@ -13,6 +13,14 @@ from .exceptions import ParameterError, DefinitionError, PARAMETER_TYPE, MISS_PA
 SKIP_GETVALUE = ('Input', )
 
 
+def is_input(o):
+    if isinstance(o, Input):
+        return True
+
+    if hasattr(o, '__name__') and o.__name__ == 'Input':
+        return True
+
+
 def assert_int(a):
     if not a.isdigit():
         error = f'"{a}" is not a int'
@@ -50,14 +58,19 @@ class SimpleOptionsHandler(BaseOptionsHandler):
     def validate_options(func: FunctionType, options: Queue, args: list):
         annotation = func.__annotations__
         al = []
-
         for a in args:
             arg_type = annotation.get(a)
-            if hasattr(arg_type, '__name__') and arg_type.__name__ in SKIP_GETVALUE:
-                arg = None
-                if arg_type.__name__ == 'Input':
-                    default = func.__kwdefaults__.get(a) if func.__kwdefaults__ else None
-                    arg = Input(a, default=default)
+            if is_input(arg_type):
+                if isinstance(arg_type, type):
+                    arg_type = arg_type()
+
+                if not arg_type.prompt:
+                    arg_type.prompt = a
+
+                default = func.__kwdefaults__.get(a) if func.__kwdefaults__ else None
+                if default:
+                    arg_type.default = default
+                arg = arg_type.input()
 
                 al.append(arg)
                 continue
@@ -170,7 +183,7 @@ class OptionsTagHandler(BaseOptionsHandler):
                 if func.__kwdefaults__ and k in func.__kwdefaults__:
                     tag_context[k]['required'] = False
 
-                if func.__annotations__.get(k) and func.__annotations__[k].__name__ == 'Input':
+                if func.__annotations__.get(k) and is_input(func.__annotations__[k]):
                     msg = 'Parameter decorated by `Options` cannot be defined as `Input` parameter'
                     raise DefinitionError(msg)
         return tag_context
@@ -184,11 +197,17 @@ class OptionsTagHandler(BaseOptionsHandler):
             arg_type = annotation.get(k)
             arg = v
 
-            if hasattr(arg_type, '__name__') and arg_type.__name__ in SKIP_GETVALUE:
-                arg = None
-                if arg_type.__name__ == 'Input':
-                    default = func.__kwdefaults__.get(k) if func.__kwdefaults__ else None
-                    arg = Input(k, default=default)
+            if is_input(arg_type):
+                if isinstance(arg_type, type):
+                    arg_type = arg_type()
+
+                if not arg_type.prompt:
+                    arg_type.prompt = k
+
+                default = func.__kwdefaults__.get(k) if func.__kwdefaults__ else None
+                if default:
+                    arg_type.default = default
+                arg = arg_type.input()
 
                 result[k] = arg
                 continue
@@ -231,7 +250,7 @@ class OptionsTagHandler(BaseOptionsHandler):
 
         for i in varnames[:]:
             var_type = func.__annotations__.get(i)
-            if var_type and hasattr(var_type, '__name__') and var_type.__name__ == 'Input':
+            if var_type and is_input(var_type):
                 args[i] = None
                 varnames.remove(i)
 
@@ -332,7 +351,7 @@ class OptionsTagHandler(BaseOptionsHandler):
             found = False if not context.get(var) else True
             arg_type = func.__annotations__.get(var)
             if found is False:
-                if arg_type and arg_type.__name__ == 'Input':
+                if is_input(arg_type):
                     continue
 
                 if has_tag:

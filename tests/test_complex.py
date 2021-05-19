@@ -29,18 +29,6 @@ class MyTask(likeshell.Main):
         assert args == tuple()
         raise RuntimeError('run task2')
 
-    def task3(
-            self,
-            a1,
-            a2: likeshell.Input,
-            *,
-            a3='default'
-    ):
-        assert a1 == 'arg1'
-        assert isinstance(a2, likeshell.Input)
-        assert a3 == 'default' or a3 == 'arg3'
-        raise RuntimeError('run task3')
-
     @likeshell.Options(tag='--arg2', arg='a2')
     def task4(
             self,
@@ -110,22 +98,6 @@ class TestComplex(unittest.TestCase):
         except RuntimeError as e:
             self.assertEqual('run task2', str(e))
 
-    def test3_task3(self):
-        # task3
-        sys.argv = ['test.py', 'task3', 'arg1']
-        try:
-            run()
-            assert False
-        except RuntimeError as e:
-            self.assertEqual('run task3', str(e))
-
-        sys.argv = ['test.py', 'task3', 'arg1', 'arg3']
-        try:
-            run()
-            assert False
-        except RuntimeError as e:
-            self.assertEqual('run task3', str(e))
-
     def test4_task4(self):
         # task4
         sys.argv = ['test.py', 'task4', 'arg1', '--arg2', 'arg2']
@@ -178,16 +150,3 @@ class TestComplex(unittest.TestCase):
             self.assertEqual('Parameter decorated by `Options` cannot be defined as `Input` parameter', str(e))
 
         empty_set()
-
-        sys.argv = ['test.py', 'task7', '--arg', 'arg1']
-        try:
-            class Task(likeshell.Shell):
-                @likeshell.Options(tag='--arg', arg='a1')
-                def task7(
-                        self,
-                        a1,
-                        a2: likeshell.Input,
-                ):
-                    raise RuntimeError('run task7')
-        except RuntimeError as e:
-            self.assertEqual('run task7', str(e))

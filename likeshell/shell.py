@@ -33,7 +33,7 @@ class CommandHandler:
     def load_parameters(self, func):
         if isinstance(self.tasks.__options_handler__, SimpleOptionsHandler):
             for t in func.__annotations__.values():
-                if issubclass(t, Options):
+                if isinstance(t, type) and issubclass(t, Options):
                     self.tasks.__options_handler__ = OptionsTagHandler()
                     break
 
