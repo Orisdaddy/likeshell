@@ -3,7 +3,7 @@ import importlib
 import os
 from setuptools import setup
 
-DESCRIPTION = "快速构建自己的命令行工具包。 Quickly develop your command line interface(CLI) toolkit."
+DESCRIPTION = "快速构建一个干净整洁的命令行工具包。Quickly develop your command line interface(CLI) toolkit."
 VERSION = importlib.import_module('likeshell.__version__').__version__
 
 LONG_DESCRIPTION = ""
@@ -22,13 +22,13 @@ setup(
     author_email="edeport126@gmail.com",
     license='Apache License 2.0',
     url="https://github.com/Orisdaddy/likeshell",
-    keywords=['shell', 'command', 'line'],
+    keywords=['shell', 'command', 'line', 'cli'],
     packages=['likeshell'],
     include_package_data=True,
     platforms="any",
     python_requires=">=3.6",
-    classifiers=(
-        "Development Status :: 4 - Beta",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
@@ -37,5 +37,5 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9'
-    )
+    ]
 )
