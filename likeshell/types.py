@@ -20,29 +20,32 @@ class Input:
     """
     Input
     """
-    def __init__(self, prompt, default=None):
-        self.prompt = prompt
-        self.default = default
-        self.msg = None
-
-    def input(
+    def __init__(
             self,
-            message: str = None,
-            callback: FunctionType = None,
+            prompt: str = None,
+            default: str = None,
             hide: bool = False,
-            default=None
+            callback: FunctionType = None
     ):
         """
-        Get input message.
-
-        :param message: The prompt string
+        :param prompt: The prompt string
         :param callback: Requires receive 1 parameter and return 1 parameter
         :param hide: echo turned off, Used for a password
         """
-        message = message or adapt_colon(self.prompt)
-        default = default or self.default
+        self.prompt = prompt
+        self.hide = hide
+        self.default = default
+        self.callback = callback
+        self.msg = None
 
-        if hide is True:
+    def input(self):
+        """
+        Get input message.
+        """
+        message = self.prompt
+        default = self.default
+
+        if self.hide is True:
             result = getpass.getpass(message)
         else:
             result = input(message)
@@ -50,10 +53,15 @@ class Input:
         if not result and default is not None:
             result = default
 
-        if callable(callback):
-            result = callback(result)
+        if callable(self.callback):
+            result = self.callback(result)
 
         return result
+
+    def __setattr__(self, key, value):
+        if key == 'prompt':
+            value = adapt_colon(value)
+        self.__dict__[key] = value
 
 
 class Options(OptList, OptStr):
