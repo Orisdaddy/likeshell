@@ -169,6 +169,10 @@ class OptionsTagHandler(BaseOptionsHandler):
                 tag_context[k]['required'] = True
                 if func.__kwdefaults__ and k in func.__kwdefaults__:
                     tag_context[k]['required'] = False
+
+                if func.__annotations__.get(k) and func.__annotations__[k].__name__ == 'Input':
+                    msg = 'Parameter decorated by `Options` cannot be defined as `Input` parameter'
+                    raise DefinitionError(msg)
         return tag_context
 
     @staticmethod
@@ -183,7 +187,7 @@ class OptionsTagHandler(BaseOptionsHandler):
             if hasattr(arg_type, '__name__') and arg_type.__name__ in SKIP_GETVALUE:
                 arg = None
                 if arg_type.__name__ == 'Input':
-                    default = func.__kwdefaults__.get(k)
+                    default = func.__kwdefaults__.get(k) if func.__kwdefaults__ else None
                     arg = Input(k, default=default)
 
                 result[k] = arg
@@ -326,7 +330,11 @@ class OptionsTagHandler(BaseOptionsHandler):
         has_tag = False
         for var in func.__code__.co_varnames[1: args_count]:
             found = False if not context.get(var) else True
+            arg_type = func.__annotations__.get(var)
             if found is False:
+                if arg_type and arg_type.__name__ == 'Input':
+                    continue
+
                 if has_tag:
                     msg = 'Cannot define positional parameter after parameter decorated by `Options`.'
                     raise DefinitionError(msg)
