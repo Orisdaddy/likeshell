@@ -39,6 +39,11 @@ class Alias(Context):
     def get(self, name):
         return self.context.get(name)
 
+    def find_alias(self, name):
+        for a, n in self.context.items():
+            if n == name:
+                return a
+
 
 alias_set = Alias()
 

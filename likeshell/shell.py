@@ -168,6 +168,8 @@ class CommandHandler:
             for k in cm:
                 # func_name = self.tasks.__ls_task__[k]
                 space = ' '
+                alias = alias_set.find_alias(k)
+                k = alias if alias else k
                 opt = f'  {k}'
                 output(opt)
         sys.exit()
