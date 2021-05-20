@@ -63,7 +63,6 @@ class TestAlias(unittest.TestCase):
             self.assertEqual('run task3', str(e))
 
     def test_tag_missing(self):
-        sys.argv = ['test.py']
         try:
             class TestTask(likeshell.Shell):
                 @likeshell.alias('alias')
@@ -73,5 +72,6 @@ class TestAlias(unittest.TestCase):
                 @likeshell.alias('alias')
                 def alias2(self):
                     pass
+            assert False
         except DefinitionError as e:
             self.assertEqual('The aliases of "alias1" and "alias2" are duplicated', str(e))

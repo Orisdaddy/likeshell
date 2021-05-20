@@ -63,15 +63,15 @@ class TestOptions(unittest.TestCase):
         try:
             run()
             assert False
-        except DefinitionError as e:
-            self.assertEqual('"a1"[-a] missing 1 required parameters', str(e))
+        except ParameterError as e:
+            self.assertEqual('MissingParameter: "a1"[-a] missing 1 required parameters.', str(e))
 
         sys.argv = ['test.py', 'mul_options', '-a', 'arg1', 'arg2', 'arg3']
         try:
             run()
             assert False
-        except DefinitionError as e:
-            self.assertEqual('"a1" takes 2 parameters but 3 were given', str(e))
+        except ParameterError as e:
+            self.assertEqual('MissingParameter: "a1" takes 2 parameters but 3 were given.', str(e))
 
     def test3_mul_tag_options(self):
         sys.argv = ['test.py', 'mul_tag_options', '-a', 'arg1', 'arg2']
@@ -117,35 +117,35 @@ class TestOptions(unittest.TestCase):
         empty_set()
 
         # duplicate tag
-        sys.argv = ['test.py', 'task1']
         try:
             class Task(likeshell.Shell):
                 @likeshell.Options(arg='a', tag=['--arg', '-a'])
                 @likeshell.Options(arg='b', tag='--arg')
                 def task1(self, a, b):
                     pass
+            assert False
         except DefinitionError as e:
             self.assertEqual('Duplicate tag: --arg', str(e))
         empty_set()
 
         # define default value
-        sys.argv = ['test.py', 'task1']
         try:
             class Task(likeshell.Shell):
                 @likeshell.Options(arg='a', tag=['--arg', '-a'])
                 @likeshell.Options(arg='b', tag='-b')
                 def task1(self, a, *, b):
                     pass
+            assert False
         except DefinitionError as e:
             self.assertEqual('Parameters after `*` need to define default value', str(e))
         empty_set()
 
         # positional parameter and parameter decorated by `Options`
-        sys.argv = ['test.py', 'task1']
         try:
             class Task(likeshell.Shell):
                 @likeshell.Options(arg='a', tag=['--arg', '-a'])
                 def task1(self, a, b):
                     pass
+            assert False
         except DefinitionError as e:
             self.assertEqual('Cannot define positional parameter after parameter decorated by `Options`.', str(e))
