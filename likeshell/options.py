@@ -1,13 +1,9 @@
-import copy
-
 from queue import Queue, Empty
-
 from types import FunctionType
 from typing import Union, List
 
-from .context import opt_set
-from .definition import is_options, is_input
-from .exceptions import ParameterError, DefinitionError, PARAMETER_TYPE, MISS_PARAMETER
+from .definition import is_input
+from .exceptions import ParameterError, PARAMETER_TYPE, MISS_PARAMETER
 
 
 SKIP_GETVALUE = ('Input', )

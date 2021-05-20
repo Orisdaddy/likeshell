@@ -2,6 +2,7 @@ import os
 
 ITEM = ('alias', 'options')
 
+
 def parse_item(content, item):
     if item == 'alias':
         return parse_alias(content)

@@ -4,7 +4,6 @@ from types import FunctionType
 from typing import Union
 from .context import opt_set
 from .exceptions import DefinitionError
-from .typehints import OptStr, OptList
 
 
 def adapt_colon(msg):
