@@ -8,8 +8,10 @@
 [![codecov](https://codecov.io/gh/Orisdaddy/likeshell/branch/master/graph/badge.svg)](https://codecov.io/gh/Orisdaddy/likeshell)
 
 
-likeshell 快速构建自己的命令行工具，扩展性强、可配置、开箱即用、干净整洁，
-只需一步构建自己的CLI。
+likeshell 快速构建自己的命令行工具，扩展性强、可配置、开箱即用、干净整洁，只需一步构建自己的CLI。
+
+likeshell通过定义类中方法的形式定义CLI中的命令，极少有任务逻辑外的代码，使用简单，使开发的CLI程序简洁易用可读性强。
+
 
 ## 要求
 
@@ -31,11 +33,11 @@ $ pip install likeshell
 ```python
 import likeshell
 
-class MyTasks(likeshell.Shell):
-    def task1(
-            self,
-            s1: str, # 不指定类型则不校验
-            i1: int,
+class MyTasks(likeshell.Shell):  # 定义类并继承likeshell.Shell，类名并不影响程序。
+    def task1(        # 方法名默认为命令名
+            self,     # 默认按顺序输入参数，self被忽略
+            s1,       # 不指定类型则不校验
+            i1: int,  # 指定类型会校验参数类型
             f1: float
         ):
         print('run test1')
@@ -45,7 +47,6 @@ class MyTasks(likeshell.Shell):
     
     def task2(self):
         print('run test2')
-
 ```
 
 ```shell script
