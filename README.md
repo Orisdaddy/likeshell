@@ -70,17 +70,424 @@ class MyTasks(likeshell.Shell):
 ## 功能文档
 ### 基础功能
 
-- [基本使用](docs/basic/Usage.md)
-- [参数](docs/basic/Parameter.md)
-- [钩子](docs/basic/Hook.md)
-- [帮助](docs/basic/Help.md)
+- [基本使用](#基本使用)
+- [参数](#参数)
+- [钩子](#钩子)
+- [帮助](#帮助)
 
 ### 高级功能
 
-- [任务别名](docs/advanced/Alias.md)
-- [无视任务](docs/advanced/Ignore.md)
-- [程序入口](docs/advanced/Main.md)
-- [输入(input)](docs/advanced/Input.md)
-- [可选参数](docs/advanced/Options.md)
-- [配置](docs/advanced/Config.md)
-- [命令执行](docs/advanced/ExecuteCommand.md)
+- [任务别名](#任务别名)
+- [无视任务](#无视任务)
+- [输入(input)](#输入)
+- [可选参数](#可选参数)
+- [命令执行](#命令执行)
+- [程序入口](#程序入口)
+- [配置](#配置)
+
+
+
+## 基本使用
+
+基础使用可完全使用Python语法，除继承操作外不需要使用`likeshell`中的任何方法。
+
+1.创建命令类并继承`likeshell.Shell`
+2.创建相应的命令任务(命令默认为方法名)
+3.定义参数
+
+```python
+# 导入likeshell包
+import likeshell
+
+# 创建类并继承likeshell.Shell
+class MyTasks(likeshell.Shell):
+    # 创建相应的命令任务
+    def task1(self, s1, i1, f1):
+        print('run test1')
+        print(f's1 is {s1}')
+        print(f'i1 is {i1}')
+        print(f'f1 is {f1}')
+    
+    def task2(self):
+        print('run test2')
+```
+
+## 参数
+
+任务中的参数定义
+
+### 参数类型
+
+通过type annotation语法增加类型校验
+
+```python
+import likeshell
+
+class MyTasks(likeshell.Shell):
+    def task1(self, s1):
+        print(f's1 is {s1}')
+    
+    def task2(self, i1: int):
+        print(f'i1 is {i1}')
+```
+
+```shell script
+>> python demo.py task1 100
+<< s1 is 100
+
+>> python demo.py task2 str1
+<< TypeError: "str1" is not a int
+```
+
+### 可变长参数(*args)
+
+```python
+import likeshell
+
+class MyTasks(likeshell.Shell):
+    def task1(self, *args):
+        print(f'args: {args}')
+```
+
+```shell script
+>> python demo.py task1 a1 a2 a3
+<< args: ['a1', 'a2', 'a3']
+```
+
+### 非必要参数与默认值
+
+```python
+import likeshell
+
+class MyTasks(likeshell.Shell):
+    def task1(
+            self,
+            s1: str,
+            *,  # 通过*分割必要参数与非必要参数
+            s2: str = 'string'
+        ):
+        print(f's1: {s1}')
+        print(f's2: {s2}')
+```
+
+```shell script
+>> python demo.py task1 str1
+<< s1: str1
+   s2: string
+
+>> python demo.py task1 str1 str2
+<< s1: str1
+   s2: str2
+```
+
+## 钩子
+
+```python
+import likeshell
+
+class GitShell(likeshell.Shell):
+    # 在命令执行之前生效
+    def __before__(self):
+        print('run before')
+    
+    # 在命令执行之后生效
+    def __after__(self):
+        print('run after')
+```
+
+## 帮助
+
+通过`-h`或`--help`获得方法相关的提示
+
+```python
+import likeshell
+
+class MyTasks(likeshell.Shell):
+    def task1(self, s1, i1, f1):
+        """
+        定义多行注释，help会将其作为命令说明打印
+        task1说明:
+            task1 takes 3 arguments
+        """
+        print('run test1')
+        print(f's1 is {s1}')
+        print(f'i1 is {i1}')
+        print(f'f1 is {f1}')
+    
+    def task2(self):
+        """
+        task is a method
+        """
+        print('run test2')
+```
+
+```shell script
+>> python demo.py
+<< 帮助:
+      <shell> -h
+      <shell> -h <action>
+   用法:
+      <shell> <action> [options...]
+    
+   命令:
+      task1
+      task2
+
+>> python demo.py -h task1
+<< 定义多行注释，help会将其作为命令说明打印
+   task1说明:
+       task1 takes 3 arguments
+```
+
+## 任务别名
+
+在程序中命令默认去匹配方法名，
+当希望使用的命令名为python中关键字、包含特殊字符或希望定义的更加简短时，可以通过定义别名的方式实现。
+
+### 通过多行注释
+在方法中定义`:alias`开头的多行注释 
+通过空格` `或`:`分割实现别名定义
+
+```python
+import likeshell
+
+class MyTasks(likeshell.Shell):
+    def task1(self):
+        """
+        定义方法task1的别名为lambda
+        
+        :alias: lambda
+        """
+        print('run task1')
+```
+
+```shell script
+>> python demo.py lambda
+<< run task1
+```
+
+
+### 通过装饰器
+
+使用`likeshell.alias`装饰器实现别名定义
+
+```python
+import likeshell
+
+class MyTasks(likeshell.Shell):
+    # 定义方法task1的别名为lambda
+    @likeshell.alias('lambda')
+    def task1(self):
+        print('run task1')
+```
+
+```shell script
+>> python demo.py lambda
+<< run task1
+```
+
+## 无视任务
+
+### 通过装饰器
+
+使用`likeshell.ignore`装饰器无视指定的方法
+
+```python
+import likeshell
+
+class MyTasks(likeshell.Shell):
+    @likeshell.ignore
+    def task1(self):
+        print('run task1')
+```
+
+```shell script
+>> python demo.py task1
+<< RuntimeError: task1 is not found.
+```
+
+## 输入
+
+实现用户输入
+
+### 使用
+
+```python
+import likeshell
+
+
+class MyTasks(likeshell.Shell):
+    def task1(
+            self,
+            a: likeshell.Input  # 定义类型为 likeshell.Input
+        ):
+        print('run task1')
+        print(a)
+```
+
+```shell script
+>> python demo.py task1
+>> a:
+>> a: hello world
+<< run task1
+   hello world
+```
+
+### 参数说明
+
+```python
+import likeshell
+
+
+def valid(arg):
+    arg += '!'
+    return arg
+
+
+class MyTasks(likeshell.Shell):
+    def task1(
+            self,
+            a: str,
+            b: likeshell.Input(prompt='username:', default='default', hide=False, callback=valid),
+            c: str
+    ):
+        """
+        参数说明
+            :prompt: 输入时显示的提示字符串
+            :default: 输入为空时 使用默认值
+            :hide: 隐藏输入内容
+            :callback: 回调函数 要求接收一个参数 返回一个参数
+        """
+        print('run task1')
+        print(a)
+        print(b)
+        print(c)
+```
+
+```shell script
+>> python demo.py task1 astr cstr
+>> username: joker
+<< run task1
+   astr
+   joker!
+   cstr
+```
+
+## 可选参数
+
+支持以`-a`、`--arg`绑定标签的形式定义参数
+
+
+### 通过类型定义
+
+```python
+import likeshell
+
+ 
+class MyTasks(likeshell.Shell):
+    def task1(
+            self,
+            a1,
+            a2: likeshell.Options(tag='--a2', arglen=2),
+    ):
+        """
+        参数说明
+            :tag: 可识别的标签名 多个使用元组或列表例如['-a', '--arg']
+            :arglen: 指定接收的参数个数
+        """
+        print(a1, a2[0], a2[1])
+        assert a1 == 'hello'
+        assert a2 == ['world', '!']
+```
+
+```shell script
+>> python demo.py task1 hello --a2 world !
+<< hello world !
+```
+
+
+### 通过装饰器
+
+```python
+import likeshell
+
+
+class MyTasks(likeshell.Shell):
+    @likeshell.Options(arg='a1', tag='--a1')
+    @likeshell.Options(arg='a2', tag='--a2')
+    def task1(
+            self,
+            a1,
+            a2,
+    ): 
+        """
+        参数说明
+            :arg: 可选参数对应的位置参数名称
+            :tag: 可识别的标签名 多个使用元组或列表例如['-a', '--arg']
+            :arglen: 指定接收的参数个数
+        """
+        print(a1, a2)
+        assert a1 == 'hello'
+        assert a2 == 'world'
+```
+
+
+```shell script
+>> python demo.py task1 --a2 world -a1 hello
+<< hello world
+```
+
+## 命令执行
+
+### 使用
+
+```python
+import likeshell
+
+
+class MyTasks(likeshell.Shell):
+    def task1(self):
+        self.cmd('git branch')
+        # likeshell.cmd('git branch')  # 两者效果一样
+
+        # p = self.cmd('git branch', popen=True)  # 通过子进程执行命令
+        # print(p.pid)
+```
+
+```shell script
+>> python demo.py task1
+>> * master
+```
+
+## 程序入口
+
+当CLI程序需要配置入口时
+
+```python
+import likeshell
+from likeshell.shell import run_cls
+
+ 
+class MyTasks(likeshell.Main):  # 继承 likeshell.Main
+    def task1(self):
+        print('run task1')
+
+
+def run():
+    # 调用run_cls方法
+    run_cls(MyTasks, MyTasks.__dict__)
+
+```
+
+## 配置
+
+```python
+import likeshell
+
+class MyTasks(likeshell.Shell):
+    __default_bash__ = 'git'  # 命令未击中时 可以使用其他cli (默认为None)
+    __options_handler__ = likeshell.SimpleOptionsHandler()  # 参数处理器
+
+    def task1(self):
+        print('run task1')
+```
