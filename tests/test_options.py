@@ -111,7 +111,7 @@ class TestOptions(unittest.TestCase):
         except RuntimeError as e:
             self.assertEqual('run task5', str(e))
 
-    def test6_definition_error(self):
+    def test999_definition_error(self):
         from likeshell.context import empty_set
 
         empty_set()
