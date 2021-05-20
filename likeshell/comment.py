@@ -1,4 +1,5 @@
 import os
+from .util import adapt_linesep
 
 ITEM = ('alias', 'options')
 
@@ -21,14 +22,7 @@ def parse_comment(doc):
         'alias': None
     }
 
-    if '\r\n' in doc:
-        nl = '\r\n'
-    elif '\n' in doc:
-        nl = '\n'
-    elif '\r' in doc:
-        nl = '\r'
-    else:
-        nl = os.linesep
+    nl = adapt_linesep(doc)
 
     lines = doc.split(nl)
     for line in lines:

@@ -1,2 +1,7 @@
+coverage:
+  status:
+    patch: off
+    project: off
+
 comment:
   show_carryforward_flags: false

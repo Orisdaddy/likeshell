@@ -15,3 +15,15 @@ def cmd(arg,
                                 universal_newlines=True)
     else:
         os.system(arg)
+
+
+def adapt_linesep(content):
+    if '\r\n' in content:
+        nl = '\r\n'
+    elif '\n' in content:
+        nl = '\n'
+    elif '\r' in content:
+        nl = '\r'
+    else:
+        nl = os.linesep
+    return nl

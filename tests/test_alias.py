@@ -3,7 +3,7 @@ import likeshell
 import unittest
 
 from likeshell.shell import run_cls
-from likeshell.exceptions import DefinitionError
+from likeshell.exceptions import DefinitionError, CommandError
 
 
 class MyTask(likeshell.Main):
@@ -46,6 +46,13 @@ class TestAlias(unittest.TestCase):
         except SystemExit:
             pass
 
+        sys.argv = ['test.py', '-h']
+        try:
+            run()
+            assert False
+        except SystemExit:
+            pass
+
     def test_alias2(self):
         sys.argv = ['test.py', 'a2']
         try:
@@ -61,6 +68,13 @@ class TestAlias(unittest.TestCase):
             assert False
         except RuntimeError as e:
             self.assertEqual('run task3', str(e))
+
+        sys.argv = ['test.py', 'a4']
+        try:
+            run()
+            assert False
+        except CommandError as e:
+            self.assertEqual('CommandNotFound: Commend "a4" is not found. Similar command: a2', str(e))
 
     def test_tag_missing(self):
         try:
