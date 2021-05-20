@@ -92,7 +92,7 @@ class CommandHandler:
         the command will be executed by the program specified by `__default_bash__`
         """
         if self.tasks.__default_bash__:
-            cmdarg = ' '.join(self.args[1:])
+            cmdarg = ' '.join(self.args)
             os.system(f'{self.tasks.__default_bash__} {cmdarg}')
         else:
             self.command_not_found(self.action)
