@@ -1,4 +1,4 @@
-import os
+from .util import adapt_linesep
 
 __all__ = [
     'Color', 'output', 'output_comment',
@@ -41,15 +41,7 @@ def output(content, background=0, color=Color.WHITE, *args, **kwargs):
 def output_comment(content, background=0, color=Color.WHITE, *args, **kwargs):
     msg = ''
 
-    if '\r\n' in content:
-        nl = '\r\n'
-    elif '\n' in content:
-        nl = '\n'
-    elif '\r' in content:
-        nl = '\r'
-    else:
-        nl = os.linesep
-
+    nl = adapt_linesep(content)
     content = content.strip(nl)
 
     indent_space = 0

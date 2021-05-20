@@ -48,21 +48,6 @@ class Alias(Context):
 alias_set = Alias()
 
 
-class Argument(Context):
-    def __init__(self, func_name):
-        self.func_name = func_name
-        super().__init__()
-
-    def add(self, name, f):
-        self.context[name] = f
-
-    def pop(self, name):
-        return self.context.pop(name)
-
-    def get(self, name):
-        return self.context.get(name)
-
-
 class Ignore(Context):
     def __init__(self):
         super().__init__([])
