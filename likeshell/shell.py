@@ -60,8 +60,11 @@ class CommandHandler:
 
     def command_not_found(self, action, throws=True):
         instruction = {}
-        instruction.update(alias_set.context)
         instruction.update(self.tasks.__ls_task__)
+        for v in alias_set.context.values():
+            if v in self.tasks.__ls_task__:
+                del instruction[v]
+        instruction.update(alias_set.context)
 
         similarity_dice = {}
         for i in instruction:
@@ -107,17 +110,13 @@ class CommandHandler:
                 option = None
             self.help(option)
 
-        if not alias_set.empty:
-            if alias_set.get(action):
-                action = alias_set.get(action)
-
-                if ignore_set.exist(action):
-                    return
+        if not alias_set.empty and alias_set.get(action):
+            action = alias_set.get(action)
 
         func = getattr(self.tasks, action, None)
 
         if func is None:
-            self.default_command()
+            return self.default_command()
 
         if not callable(func):
             return self.command_not_found(self.action)
