@@ -5,27 +5,12 @@ from queue import Queue, Empty
 from types import FunctionType
 from typing import Union, List
 
-from .types import Input, Options
 from .context import opt_set
+from .definition import is_options, is_input
 from .exceptions import ParameterError, DefinitionError, PARAMETER_TYPE, MISS_PARAMETER
 
 
 SKIP_GETVALUE = ('Input', )
-
-
-def is_input(o):
-    if isinstance(o, Input):
-        return True
-
-    if hasattr(o, '__name__') and o.__name__ == 'Input':
-        return True
-    return False
-
-
-def is_options(o):
-    if isinstance(o, Options):
-        return True
-    return False
 
 
 def assert_int(a):
@@ -47,12 +32,13 @@ def assert_float(a):
 class BaseOptionsHandler:
     options_type = None
 
-    def process_options(self, func: FunctionType, options):
+    def process_options(self, func: FunctionType, options, context=None):
         """
         Process parameters and return a list or dict
 
         :param func: The command method
         :param options: Parameter container specified by `options_type`
+        :param context:
         """
         raise NotImplementedError
 
@@ -99,7 +85,7 @@ class SimpleOptionsHandler(BaseOptionsHandler):
         for i in al:
             options.put(i)
 
-    def process_options(self, func: FunctionType, options: Queue) -> Union[list, dict, None]:
+    def process_options(self, func: FunctionType, options: Queue, context=None) -> Union[list, dict, None]:
         args_count = func.__code__.co_argcount
         if 'args' in func.__code__.co_varnames:
             args_count += 1
@@ -141,54 +127,6 @@ class SimpleOptionsHandler(BaseOptionsHandler):
 
 class OptionsTagHandler(BaseOptionsHandler):
     options_type = 'list'
-
-    @staticmethod
-    def process_context(func):
-        annotation = func.__annotations__
-
-        tag_model_context = {}
-        for arg, t in annotation.items():
-            if is_options(t):
-                t.arg = arg
-                tag_model_context[arg] = {
-                    'arglen': t.arglen,
-                    'tag': t.tag,
-                    'common_tag': t.common_tag,
-                }
-
-        tag_context = opt_set.get(func.__name__)
-        if tag_context:
-            tag_context.update(tag_model_context)
-        else:
-            tag_context = tag_model_context
-
-        tmp_tag_context = copy.deepcopy(tag_context)
-
-        tag_list = []
-        if tag_context:
-            for k, v in tmp_tag_context.items():
-                if isinstance(v['tag'], str):
-                    if v['tag'] in tag_list:
-                        msg = f'Duplicate tag: {v["tag"]}'
-                        raise DefinitionError(msg)
-
-                    tag_list.append(v['tag'])
-                elif isinstance(v['tag'], (tuple, list)):
-                    for i in v['tag']:
-                        if i in tag_list:
-                            msg = f'Duplicate tag: {i}'
-                            raise DefinitionError(msg)
-
-                        tag_list.append(v['tag'])
-
-                tag_context[k]['required'] = True
-                if func.__kwdefaults__ and k in func.__kwdefaults__:
-                    tag_context[k]['required'] = False
-
-                if func.__annotations__.get(k) is not None and is_input(func.__annotations__[k]):
-                    msg = 'Parameter decorated by `Options` cannot be defined as `Input` parameter'
-                    raise DefinitionError(msg)
-        return tag_context
 
     @staticmethod
     def validate_type(func, args: dict):
@@ -320,13 +258,13 @@ class OptionsTagHandler(BaseOptionsHandler):
                         s = 's'
 
                     msg = f'"{k}" takes {v["arglen"]} parameter{s} but {len(tag_args_list)} were given'
-                    raise DefinitionError(msg)
+                    raise ParameterError(MISS_PARAMETER, msg)
                 elif len(tag_args_list) < v['arglen']:
                     if v["arglen"] - len(tag_args_list):
                         s = 's'
 
                     msg = f'"{k}"[{v["common_tag"]}] missing {v["arglen"] - len(tag_args_list)} required parameter{s}'
-                    raise DefinitionError(msg)
+                    raise ParameterError(MISS_PARAMETER, msg)
                 else:
                     if len(tag_args_list) == 1:
                         args[k] = tag_args_list[0]
@@ -337,31 +275,7 @@ class OptionsTagHandler(BaseOptionsHandler):
                     raise ParameterError(MISS_PARAMETER, arg=k)
         return args
 
-    def process_options(self, func: FunctionType, options: List[str]) -> dict:
-        args_count = func.__code__.co_argcount
-        if func.__kwdefaults__:
-            args_count += len(func.__kwdefaults__)
-
-        if args_count != len(func.__code__.co_varnames):
-            msg = 'Parameters after `*` need to define default value'
-            raise DefinitionError(msg)
-
-        context = self.process_context(func)
-
-        has_tag = False
-        for var in func.__code__.co_varnames[1: args_count]:
-            found = False if not context.get(var) else True
-            arg_type = func.__annotations__.get(var)
-            if found is False:
-                if is_input(arg_type):
-                    continue
-
-                if has_tag:
-                    msg = 'Cannot define positional parameter after parameter decorated by `Options`.'
-                    raise DefinitionError(msg)
-            else:
-                has_tag = found
-
+    def process_options(self, func: FunctionType, options: List[str], context=None) -> dict:
         pos_args = self.get_positional_parameters(context, options, func)
         tag_args = self.get_tag_parameters(context, options)
         args = self.validate_tag_parameters(tag_args, context)

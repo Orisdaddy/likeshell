@@ -137,7 +137,6 @@ class TestComplex(unittest.TestCase):
 
         empty_set()
         # Options and Input
-        sys.argv = ['test.py', 'task7', '--arg', 'arg1']
         try:
             class Task(likeshell.Shell):
                 @likeshell.Options(tag='--arg', arg='a1')
@@ -146,6 +145,7 @@ class TestComplex(unittest.TestCase):
                         a1: likeshell.Input,
                 ):
                     raise RuntimeError('run task7')
+            assert False
         except DefinitionError as e:
             self.assertEqual('Parameter decorated by `Options` cannot be defined as `Input` parameter', str(e))
 

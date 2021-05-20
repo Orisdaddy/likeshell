@@ -10,6 +10,7 @@ from .options import OptionsTagHandler, SimpleOptionsHandler
 from .types import Options
 from .exceptions import CommandError, COMMAND_NOT_FOUND
 from .util import cmd
+from .definition import check_definition
 
 from typing import Optional
 
@@ -24,21 +25,30 @@ class CommandHandler:
 
         self.tasks = cls()
 
+        self.context_mapping = {}
+        for k, f in self.tasks.__ls_task__.items():
+            if isinstance(self.select_handler(f), OptionsTagHandler):
+                self.context_mapping[k] = check_definition(f)
+
         # if args is empty.
         if self.args:
             self.action = self.args[0]
         else:
             self.help()
 
-    def load_parameters(self, func):
+    def select_handler(self, func):
         if isinstance(self.tasks.__options_handler__, SimpleOptionsHandler):
             for t in func.__annotations__.values():
                 if isinstance(t, Options):
-                    self.tasks.__options_handler__ = OptionsTagHandler()
-                    break
+                    return OptionsTagHandler()
 
             if not opt_set.empty and opt_set.get(func.__name__):
-                self.tasks.__options_handler__ = OptionsTagHandler()
+                return OptionsTagHandler()
+        return SimpleOptionsHandler()
+
+    def load_parameters(self, func):
+        handler = self.select_handler(func)
+        self.tasks.__options_handler__ = handler
 
         if self.tasks.__options_handler__.options_type == 'Queue':
             options = Queue()
@@ -79,8 +89,8 @@ class CommandHandler:
         the command will be executed by the program specified by `__default_bash__`
         """
         if self.tasks.__default_bash__:
-            cmd = ' '.join(self.args[1:])
-            os.system(f'{self.tasks.__default_bash__} {cmd}')
+            cmdarg = ' '.join(self.args[1:])
+            os.system(f'{self.tasks.__default_bash__} {cmdarg}')
         else:
             self.command_not_found(self.action)
 
@@ -114,10 +124,11 @@ class CommandHandler:
 
         self.load_parameters(func)
 
+        context = self.context_mapping.get(action)
         if isinstance(self.tasks.__options_handler__, type):
-            args = self.tasks.__options_handler__().process_options(func, self.options)
+            args = self.tasks.__options_handler__().process_options(func, self.options, context)
         else:
-            args = self.tasks.__options_handler__.process_options(func, self.options)
+            args = self.tasks.__options_handler__.process_options(func, self.options, context)
 
         self.tasks.__before__()
 
