@@ -40,10 +40,20 @@ def output(content, background=0, color=Color.WHITE, *args, **kwargs):
 
 def output_comment(content, background=0, color=Color.WHITE, *args, **kwargs):
     msg = ''
-    content = content.strip(os.linesep)
+
+    if '\r\n' in content:
+        nl = '\r\n'
+    elif '\n' in content:
+        nl = '\n'
+    elif '\r' in content:
+        nl = '\r'
+    else:
+        nl = os.linesep
+
+    content = content.strip(nl)
 
     indent_space = 0
-    for i, v in enumerate(content.split(os.linesep)):
+    for i, v in enumerate(content.split(nl)):
         if i == 0:
             for index, char in enumerate(v):
                 if char != ' ':
@@ -51,11 +61,11 @@ def output_comment(content, background=0, color=Color.WHITE, *args, **kwargs):
                     break
         # Eliminate spaces
         line = v[indent_space:]
-        msg += f'{line}{os.linesep}'
+        msg += f'{line}{nl}'
 
     # output
     print(__OUTPUT_STR.format(
         background=background,
         color=color,
-        content=msg,
+        content=msg.strip(nl),
     ), *args, **kwargs)

@@ -25,6 +25,8 @@ def parse_comment(doc):
         nl = '\r\n'
     elif '\n' in doc:
         nl = '\n'
+    elif '\r' in doc:
+        nl = '\r'
     else:
         nl = os.linesep
 
