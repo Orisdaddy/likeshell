@@ -59,14 +59,13 @@ class MyTasks(likeshell.Shell):  # 定义类并继承likeshell.Shell，类名并
    f1 is 10.01
 
 >> python demo.py task1
-<< ValueError: Miss parameter "s1"
+<< likeshell.exceptions.ParameterError: MissingParameter: s1.
 
 >> python demo.py task1 str1 str2 str3
-<< TypeError: "str2" is not a int
+<< likeshell.exceptions.ParameterError: ParameterTypeError: "str2" is not a int
 
 >> python demo.py task2
 << run test2
-
 ```
 
 
@@ -139,7 +138,7 @@ class MyTasks(likeshell.Shell):
 << s1 is 100
 
 >> python demo.py task2 str1
-<< TypeError: "str1" is not a int
+<< likeshell.exceptions.ParameterError: ParameterTypeError: "str1" is not a int
 ```
 
 ### 可变长参数(*args)
@@ -247,6 +246,27 @@ class MyTasks(likeshell.Shell):
 在程序中命令默认去匹配方法名，
 当希望使用的命令名为python中关键字、包含特殊字符或希望定义的更加简短时，可以通过定义别名的方式实现。
 
+likeshell提供两种方式来实现。
+
+### 通过装饰器
+
+使用`likeshell.alias`装饰器实现别名定义
+
+```python
+import likeshell
+
+class MyTasks(likeshell.Shell):
+    # 定义方法task1的别名为lambda
+    @likeshell.alias('lambda')
+    def task1(self):
+        print('run task1')
+```
+
+```shell script
+>> python demo.py lambda
+<< run task1
+```
+
 ### 通过多行注释
 在方法中定义`:alias`开头的多行注释 
 通过空格` `或`:`分割实现别名定义
@@ -269,27 +289,9 @@ class MyTasks(likeshell.Shell):
 << run task1
 ```
 
-
-### 通过装饰器
-
-使用`likeshell.alias`装饰器实现别名定义
-
-```python
-import likeshell
-
-class MyTasks(likeshell.Shell):
-    # 定义方法task1的别名为lambda
-    @likeshell.alias('lambda')
-    def task1(self):
-        print('run task1')
-```
-
-```shell script
->> python demo.py lambda
-<< run task1
-```
-
 ## 无视任务
+
+让指定任务命令不再被识别，也无法再调用
 
 ### 通过装饰器
 
@@ -357,8 +359,8 @@ class MyTasks(likeshell.Shell):
         """
         参数说明
             :prompt: 输入时显示的提示字符串
-            :default: 输入为空时 使用默认值
-            :hide: 隐藏输入内容
+            :default: 输入为空时 使用默认值 也可以通过定义参数默认值实现
+            :hide: 隐藏输入内容 默认为False
             :callback: 回调函数 要求接收一个参数 返回一个参数
         """
         print('run task1')
@@ -426,7 +428,7 @@ class MyTasks(likeshell.Shell):
         """
         参数说明
             :arg: 可选参数对应的位置参数名称
-            :tag: 可识别的标签名 多个使用元组或列表例如['-a', '--arg']
+            :tag: 可识别的标签名 要定义多个标签则使用元组或列表 例如['-a', '--arg']
             :arglen: 指定接收的参数个数
         """
         print(a1, a2)
