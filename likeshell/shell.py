@@ -211,7 +211,7 @@ class Main:
     ignore_set.add('cmd')
 
     def cmd(self, *args, **kwargs):
-        cmd(*args, **kwargs)
+        return cmd(*args, **kwargs)
 
     def __before__(self):
         pass

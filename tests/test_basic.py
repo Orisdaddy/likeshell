@@ -2,11 +2,14 @@ import sys
 import likeshell
 import unittest
 
+from likeshell.options import SimpleOptionsHandler
 from likeshell.shell import run_cls
 from likeshell import exceptions
 
 
 class MyTask(likeshell.Main):
+    __options_handler__ = SimpleOptionsHandler
+
     def task(self):
         """
         task comment
@@ -64,6 +67,13 @@ class TestBasic(unittest.TestCase):
             assert False
         except SystemExit:
             pass
+
+        sys.argv = ['test.py', 'task2']
+        try:
+            run()
+            assert False
+        except exceptions.CommandError as e:
+            self.assertEqual('CommandNotFound: Commend "task2" is not found. Similar command: task', str(e))
 
     def test_param(self):
         sys.argv = ['test.py', 'params', 'hello', 'world', '!']
