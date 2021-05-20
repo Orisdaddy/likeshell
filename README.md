@@ -28,13 +28,13 @@ $ pip install likeshell
 
 ## 简单使用
 
-创建demo.py文件
+1.创建一个python文件，这里命名为demo.py。
 
 ```python
 import likeshell
 
 class MyTasks(likeshell.Shell):  # 定义类并继承likeshell.Shell，类名并不影响程序。
-    def task1(        # 方法名默认为命令名
+    def task1(        # 命令名默认为方法名称
             self,     # 默认按顺序输入参数，self被忽略
             s1,       # 不指定类型则不校验
             i1: int,  # 指定类型会校验参数类型
@@ -48,6 +48,8 @@ class MyTasks(likeshell.Shell):  # 定义类并继承likeshell.Shell，类名并
     def task2(self):
         print('run test2')
 ```
+
+2.在终端中输入。
 
 ```shell script
 >> python demo.py task1 str1 100 10.01
