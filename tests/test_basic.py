@@ -16,6 +16,7 @@ class MyTask(likeshell.Main):
         """
         raise RuntimeError('run task')
 
+    @likeshell.desc('参数相关')
     def params(
             self,
             arg1,

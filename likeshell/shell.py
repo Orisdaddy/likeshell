@@ -5,11 +5,11 @@ from queue import Queue
 
 from .console import *
 from .comment import parse_comment
-from .context import alias_set, ignore_set, opt_set
+from .context import alias_set, ignore_set, opt_set, desc_set
 from .options import OptionsTagHandler, SimpleOptionsHandler
 from .types import Options
 from .exceptions import CommandError, COMMAND_NOT_FOUND
-from .util import cmd
+from .util import cmd, find_description
 from .definition import check_definition
 
 from typing import Optional
@@ -157,19 +157,31 @@ class CommandHandler:
                 self.command_not_found(self.action, False)
         else:
             output('帮助:')
-            output('  <shell> -h')
-            output('  <shell> -h <action>')
+            output('    <shell> -h')
+            output('    <shell> -h <action>')
             output('用法:')
-            output('  <shell> <action> [options...]', end='\n\n')
+            output('    <shell> <action> [options...]', end='\n\n')
 
             cm = sorted(self.tasks.__ls_task__)
             output('命令:')
             for k in cm:
                 # func_name = self.tasks.__ls_task__[k]
-                space = ' '
+                desc = desc_set.get(k)
+                if not desc:
+                    desc = find_description(getattr(self.tasks, k, None))
+
                 alias = alias_set.find_alias(k)
                 k = alias if alias else k
-                opt = f'  {k}'
+
+                if desc:
+                    nspace = 18 - len(k)
+                    if nspace > 0:
+                        space = ' ' * nspace
+                    else:
+                        space = ''
+                    desc = f'{space}{desc}'
+
+                opt = f'    {k}{desc}'
                 output(opt)
         sys.exit()
 
