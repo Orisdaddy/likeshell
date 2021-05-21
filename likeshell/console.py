@@ -30,7 +30,7 @@ class Color:
     BG_WHITE = 47
 
 
-def output(content, background=0, color=Color.WHITE, *args, **kwargs):
+def output(content, background=0, color=0, *args, **kwargs):
     print(__OUTPUT_STR.format(
         background=background,
         color=color,
@@ -38,7 +38,7 @@ def output(content, background=0, color=Color.WHITE, *args, **kwargs):
     ), *args, **kwargs)
 
 
-def output_comment(content, background=0, color=Color.WHITE, *args, **kwargs):
+def output_comment(content, background=0, color=0, *args, **kwargs):
     msg = ''
 
     nl = adapt_linesep(content)

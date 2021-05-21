@@ -1,4 +1,4 @@
-from .context import alias_set, ignore_set
+from .context import alias_set, ignore_set, desc_set
 
 
 def alias(name: str):
@@ -12,3 +12,9 @@ def ignore(func):
     ignore_set.add(func.__name__)
     return func
 
+
+def desc(decs):
+    def decorator(func):
+        desc_set.add(func.__name__, decs)
+        return func
+    return decorator

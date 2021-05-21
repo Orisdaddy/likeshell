@@ -27,3 +27,15 @@ def adapt_linesep(content):
     else:
         nl = os.linesep
     return nl
+
+
+def find_description(f):
+    if not f or not hasattr(f, '__doc__') or not f.__doc__:
+        return ''
+
+    nl = adapt_linesep(f.__doc__)
+    doc = f.__doc__.strip().split(nl)
+    for d in doc:
+        desc = d.strip()
+        if desc:
+            return desc

@@ -74,3 +74,14 @@ class Options(Context):
 
 
 opt_set = Options()
+
+
+class Descriptions(Context):
+    def add(self, name, desc):
+        self.context[name] = desc
+
+    def get(self, name):
+        return self.context.get(name)
+
+
+desc_set = Descriptions()
