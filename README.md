@@ -205,6 +205,7 @@ class GitShell(likeshell.Shell):
 import likeshell
 
 class MyTasks(likeshell.Shell):
+    @likeshell.desc('This is task1')  # likeshell.desc定义命令的简要说明 在-h中打印 不定义默认打印comment多行注释中的有效内容第一行
     def task1(self, s1, i1, f1):
         """
         定义多行注释，help会将其作为命令说明打印
@@ -232,8 +233,9 @@ class MyTasks(likeshell.Shell):
       <shell> <action> [options...]
     
    命令:
-      task1
-      task2
+      task1             This is task1
+      task2             task is a method
+
 
 >> python demo.py -h task1
 << 定义多行注释，help会将其作为命令说明打印
