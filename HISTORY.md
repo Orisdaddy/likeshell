@@ -1,5 +1,8 @@
 # Release
 
+### v1.1.2 Date: 2021-05-26
+- Add command description.
+
 ### v1.1.1 Date: 2021-05-20
 - Exit the program after executing default_command.
 - Improve the console format
