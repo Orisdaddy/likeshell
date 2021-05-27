@@ -246,20 +246,21 @@ class OptionsTagHandler(BaseOptionsHandler):
         args = {}
         for k, v in context.items():
             tag_args_list = tags.get(k)
+            arglen = v['arglen']
 
             if tag_args_list:
                 s = ''
-                if len(tag_args_list) > v['arglen']:
-                    if v['arglen'] > 1:
+                if len(tag_args_list) > arglen:
+                    if arglen > 1:
                         s = 's'
 
-                    msg = f'"{k}" takes {v["arglen"]} parameter{s} but {len(tag_args_list)} were given'
+                    msg = f'"{k}" takes {arglen} parameter{s} but {len(tag_args_list)} were given'
                     raise ParameterError(MISS_PARAMETER, msg)
-                elif len(tag_args_list) < v['arglen']:
-                    if v["arglen"] - len(tag_args_list):
+                elif len(tag_args_list) < arglen:
+                    if arglen - len(tag_args_list):
                         s = 's'
 
-                    msg = f'"{k}"[{v["common_tag"]}] missing {v["arglen"] - len(tag_args_list)} required parameter{s}'
+                    msg = f'"{k}"[{v["common_tag"]}] missing {arglen - len(tag_args_list)} required parameter{s}'
                     raise ParameterError(MISS_PARAMETER, msg)
                 else:
                     if len(tag_args_list) == 1:
@@ -267,8 +268,11 @@ class OptionsTagHandler(BaseOptionsHandler):
                     else:
                         args[k] = tag_args_list.copy()
             else:
-                if v['required']:
-                    raise ParameterError(MISS_PARAMETER, arg=k)
+                if arglen == 0:
+                    args[k] = 'exist'
+                else:
+                    if v['required']:
+                        raise ParameterError(MISS_PARAMETER, arg=k)
         return args
 
     def process_options(self, func: FunctionType, options: List[str], context=None) -> dict:
