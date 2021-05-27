@@ -268,11 +268,12 @@ class OptionsTagHandler(BaseOptionsHandler):
                     else:
                         args[k] = tag_args_list.copy()
             else:
-                if arglen == 0:
-                    args[k] = 'exist'
-                else:
+                if tag_args_list is None:
                     if v['required']:
                         raise ParameterError(MISS_PARAMETER, arg=k)
+                else:
+                    if arglen == 0:
+                        args[k] = 'exist'
         return args
 
     def process_options(self, func: FunctionType, options: List[str], context=None) -> dict:
