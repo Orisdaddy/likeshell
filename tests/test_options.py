@@ -13,7 +13,7 @@ class MyTask(likeshell.Main):
         raise RuntimeError('run task1')
 
     @likeshell.Options(arg='a1', tag='-a', arglen=2)
-    def mul_options(self, a1):
+    def arg_mul_options(self, a1):
         assert a1 == ['arg1', 'arg2']
         raise RuntimeError('run task2')
 
@@ -29,6 +29,20 @@ class MyTask(likeshell.Main):
     def type_mul_tag_options(self, a1: likeshell.Options(tag=['-a', '--arg1'], arglen=2)):
         assert a1 == ['arg1', 'arg2']
         raise RuntimeError('run task5')
+
+    @likeshell.Options(arg='a1', tag='-a1')
+    @likeshell.Options(arg='a2', tag='-a2')
+    def mul_options(self, a1, a2):
+        assert a1 == 'arg1'
+        assert a2 == 'arg2'
+        raise RuntimeError('run task6')
+
+    @likeshell.Options(arg='a1', tag='-a1')
+    @likeshell.Options(arg='a2', tag='-a2', arglen=0)
+    def mark_options(self, a1, a2):
+        assert a1 == 'arg1'
+        assert a2 == 'exist'
+        raise RuntimeError('run task7')
 
 
 def run():
@@ -52,21 +66,21 @@ class TestOptions(unittest.TestCase):
             self.assertEqual('MissingParameter: a1.', str(e))
 
     def test2_mul_options(self):
-        sys.argv = ['test.py', 'mul_options', '-a', 'arg1', 'arg2']
+        sys.argv = ['test.py', 'arg_mul_options', '-a', 'arg1', 'arg2']
         try:
             run()
             assert False
         except RuntimeError as e:
             self.assertEqual('run task2', str(e))
 
-        sys.argv = ['test.py', 'mul_options', '-a', 'arg1']
+        sys.argv = ['test.py', 'arg_mul_options', '-a', 'arg1']
         try:
             run()
             assert False
         except ParameterError as e:
             self.assertEqual('MissingParameter: "a1"[-a] missing 1 required parameters.', str(e))
 
-        sys.argv = ['test.py', 'mul_options', '-a', 'arg1', 'arg2', 'arg3']
+        sys.argv = ['test.py', 'arg_mul_options', '-a', 'arg1', 'arg2', 'arg3']
         try:
             run()
             assert False
@@ -110,6 +124,36 @@ class TestOptions(unittest.TestCase):
             assert False
         except RuntimeError as e:
             self.assertEqual('run task5', str(e))
+
+    def test6_mul_options(self):
+        sys.argv = ['test.py', 'mul_options', '-a2', 'arg2', '-a1', 'arg1']
+        try:
+            run()
+            assert False
+        except RuntimeError as e:
+            self.assertEqual('run task6', str(e))
+
+    def test7_mark_options(self):
+        sys.argv = ['test.py', 'mark_options', '-a2', '-a1', 'arg1']
+        try:
+            run()
+            assert False
+        except RuntimeError as e:
+            self.assertEqual('run task7', str(e))
+
+        sys.argv = ['test.py', 'mark_options', '-a1', 'arg1', '-a2']
+        try:
+            run()
+            assert False
+        except RuntimeError as e:
+            self.assertEqual('run task7', str(e))
+
+        sys.argv = ['test.py', 'mark_options', '-a1', 'arg1']
+        try:
+            run()
+            assert False
+        except ParameterError as e:
+            self.assertEqual('MissingParameter: a2.', str(e))
 
     def test999_definition_error(self):
         from likeshell.context import empty_set
