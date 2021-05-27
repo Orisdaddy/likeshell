@@ -431,7 +431,7 @@ class MyTasks(likeshell.Shell):
         参数说明
             :arg: 可选参数对应的位置参数名称
             :tag: 可识别的标签名 要定义多个标签则使用元组或列表 例如['-a', '--arg']
-            :arglen: 指定接收的参数个数
+            :arglen: 指定接收的参数个数 定义为0 将会接收到为'exist'的字符串
         """
         print(a1, a2)
         assert a1 == 'hello'
