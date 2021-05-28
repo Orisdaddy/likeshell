@@ -1,5 +1,8 @@
 # Release
 
+### v1.1.3 Date: 2021-05-28
+- Support `Options' not receive parameters.
+
 ### v1.1.2 Date: 2021-05-26
 - Add command description.
 
