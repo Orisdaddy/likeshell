@@ -1,3 +1,4 @@
+import re
 from queue import Queue, Empty
 from types import FunctionType
 from typing import Union, List
@@ -11,6 +12,10 @@ SKIP_GETVALUE = ('Input', )
 
 def assert_int(a):
     if not a.isdigit():
+        reg = re.match(r'^-\d*$', a)
+        if reg is not None:
+            return int(a)
+
         error = f'"{a}" is not a int'
         raise ParameterError(PARAMETER_TYPE, arg=a, msg=error)
     return int(a)

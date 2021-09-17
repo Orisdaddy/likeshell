@@ -16,6 +16,7 @@ class MyTask(likeshell.Main):
             arg1,
             arg2: int,
             arg3: float,
+            arg4: int,
     ):
         if arg1 != 'a1':
             raise ValueError(f'arg1 != a1')
@@ -23,6 +24,8 @@ class MyTask(likeshell.Main):
             raise ValueError(f'arg2 != 100')
         if arg3 != 100.1:
             raise ValueError(f'arg3 != 100.1')
+        if arg4 != -100:
+            raise ValueError(f'arg4 != -100')
 
     def params_default(
             self,
@@ -68,26 +71,33 @@ class TestParamsType(unittest.TestCase):
     def test_params_type(self):
         command = 'params_type'
 
-        sys.argv = ['test.py', command, 'a1', '100', '100.1']
+        sys.argv = ['test.py', command, 'a1', '100', '100.1', '-100']
         run()
 
-        sys.argv = ['test.py', command, 'hello', '100', '100.1']
+        sys.argv = ['test.py', command, 'hello', '100', '100.1', '-100']
         try:
             run()
             assert False
         except ValueError as e:
             self.assertEqual('arg1 != a1', str(e))
 
-        sys.argv = ['test.py', command, 'a1', '100.1', '100.1']
+        sys.argv = ['test.py', command, 'a1', '100.1', '100.1', '-100']
         try:
             run()
             assert False
         except exceptions.ParameterError as e:
             self.assertEqual('ParameterTypeError: "100.1" is not a int', str(e))
 
-        sys.argv = ['test.py', command, 'a1', '100', 'str']
+        sys.argv = ['test.py', command, 'a1', '100', 'str', '-100']
         try:
             run()
             assert False
         except exceptions.ParameterError as e:
             self.assertEqual('ParameterTypeError: "str" is not a float', str(e))
+
+        sys.argv = ['test.py', command, 'a1', '100', '100.1', '-100.1']
+        try:
+            run()
+            assert False
+        except exceptions.ParameterError as e:
+            self.assertEqual('ParameterTypeError: "-100.1" is not a int', str(e))
