@@ -1,5 +1,8 @@
 # Release
 
+### v1.1.4 Date: 2021-09-17
+- Fix assert int.
+
 ### v1.1.3 Date: 2021-05-28
 - Support `Options' not receive parameters.
 
