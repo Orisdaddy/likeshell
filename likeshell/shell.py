@@ -16,6 +16,7 @@ from typing import Optional
 
 
 __BUILT_IN__ = ('__options_handler__', '__default_bash__')
+filter_shell_times = 0
 
 
 class CommandHandler:
@@ -209,9 +210,12 @@ def run_cls(cls, dic, what=None, ex=None):
 
 class GsMeta(type):
     def __init__(cls, what, ex, dic):
+        global filter_shell_times
         is_main = True if dic.get('__module__') == '__main__' else False
-        if is_main is True:
+        if is_main is True or (what != 'Shell' or filter_shell_times >= 1):
             run_cls(cls, dic)
+        else:
+            filter_shell_times += 1
         super().__init__(what, ex, dic)
 
 
