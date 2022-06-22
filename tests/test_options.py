@@ -173,16 +173,16 @@ class TestOptions(unittest.TestCase):
         empty_set()
 
         # define default value
-        try:
-            class Task(likeshell.Shell):
-                @likeshell.Options(arg='a', tag=['--arg', '-a'])
-                @likeshell.Options(arg='b', tag='-b')
-                def task1(self, a, *, b):
-                    pass
-            assert False
-        except DefinitionError as e:
-            self.assertEqual('Parameters after `*` need to define default value', str(e))
-        empty_set()
+        # try:
+        #     class Task(likeshell.Shell):
+        #         @likeshell.Options(arg='a', tag=['--arg', '-a'])
+        #         @likeshell.Options(arg='b', tag='-b')
+        #         def task1(self, a, *, b):
+        #             pass
+        #     assert False
+        # except DefinitionError as e:
+        #     self.assertEqual('Parameters after `*` need to define default value', str(e))
+        # empty_set()
 
         # positional parameter and parameter decorated by `Options`
         try:

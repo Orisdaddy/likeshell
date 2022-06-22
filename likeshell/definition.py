@@ -25,9 +25,9 @@ def check_definition(func):
     if func.__kwdefaults__:
         args_count += len(func.__kwdefaults__)
 
-    if args_count != len(func.__code__.co_varnames):
-        msg = 'Parameters after `*` need to define default value'
-        raise DefinitionError(msg)
+    # if args_count != len(func.__code__.co_varnames):
+    #     msg = 'Parameters after `*` need to define default value'
+    #     raise DefinitionError(msg)
 
     context = process_context(func)
 
